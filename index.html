@@ -10,86 +10,108 @@
             background-color: #000;
             color: #0f0;
             margin: 20px;
+            overflow: hidden; /* Prevent scrollbars */
         }
 
-        #container {
+        #terminal {
             border: 2px solid #0f0;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.8); /* Slightly transparent */
+            padding: 10px;
+            height: 350px; /* Adjust as needed */
+            overflow-y: scroll;
+            background-color: rgba(0, 0, 0, 0.9); /* Slightly transparent */
         }
 
-        label {
-            display: block; /* Labels on their own line */
-            margin-bottom: 5px;
+        .command-line {
+            display: flex; /* Align prompt and input */
+            align-items: center; /* Vertically align */
         }
 
-        input[type="text"] {
-            width: calc(100% - 10px); /* Full width, adjust as needed */
-            padding: 5px;
-            margin-bottom: 10px;
+        .prompt {
+            margin-right: 5px;
+        }
+
+        #user-input {
+            flex-grow: 1; /* Input takes up available space */
             background-color: #000;
             color: #0f0;
-            border: 1px solid #0f0;
+            border: none;
+            outline: none; /* Remove default outline */
+            padding: 0; /* Remove default padding */
         }
 
-        button {
-            padding: 8px 16px;
-            background-color: #000;
-            color: #0f0;
-            border: 1px solid #0f0;
-            cursor: pointer;
-        }
-
-        #result {
-            margin-top: 10px;
-            color: #0f0;
+        .output {
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
 
-    <div id="container">
-        <h2>Binary/Decimal Converter</h2>
-
-        <label for="inputNumber">Enter Number:</label>
-        <input type="text" id="inputNumber">
-
-        <button onclick="convertToBinary()">To Binary</button>
-        <button onclick="convertToDecimal()">To Decimal</button>
-
-        <div id="result"></div>
+    <div id="terminal">
+        <div class="command-line">
+            <span class="prompt">C:\></span>
+            <input type="text" id="user-input" autofocus onkeydown="handleInput(event)">
+        </div>
     </div>
 
     <script>
-        function convertToBinary() {
-            const inputNumber = document.getElementById("inputNumber").value;
-            const num = parseInt(inputNumber);
+        const terminal = document.getElementById("terminal");
+        const userInput = document.getElementById("user-input");
 
-            if (isNaN(num)) {
-                displayResult("Invalid input. Please enter a number.");
-                return;
+        function handleInput(event) {
+            if (event.key === "Enter") {
+                const command = userInput.value;
+                displayOutput(`C:\> ${command}`); // Show the entered command
+
+                const result = processCommand(command);
+                displayOutput(result);
+
+                userInput.value = ""; // Clear input
+                scrollToBottom(); // Keep scrolled to the bottom
             }
-
-            const binary = num.toString(2);
-            displayResult(`Binary: ${binary}`);
         }
 
-        function convertToDecimal() {
-            const inputNumber = document.getElementById("inputNumber").value;
-            
-            // Check if the input is a valid binary string (contains only 0s and 1s)
-            if (!/^[01]+$/.test(inputNumber)) {
-                displayResult("Invalid binary input.  Use only 0 and 1.");
-                return;
+        function processCommand(command) {
+            command = command.trim().toLowerCase();
+
+            if (command.startsWith("bin2dec")) {
+                const binary = command.substring(7).trim(); // Extract binary value
+                if (/^[01]+$/.test(binary)) { // Check for valid binary (0s and 1s only)
+                    const decimal = parseInt(binary, 2);
+                    return `Decimal: ${decimal}`;
+                } else {
+                    return "Invalid binary input. Use only 0s and 1s.";
+                }
+            } else if (command.startsWith("dec2bin")) {
+                const decimal = command.substring(7).trim();
+                if (/^\d+$/.test(decimal)) { // Check for valid decimal (numbers only)
+                  const binary = parseInt(decimal, 10).toString(2);
+                  return `Binary: ${binary}`;
+                } else {
+                  return "Invalid decimal input. Use numbers only.";
+                }
             }
-
-            const decimal = parseInt(inputNumber, 2); // Parse base 2
-            displayResult(`Decimal: ${decimal}`);
+             else if (command === "help") {
+                return "Available commands: bin2dec [binary], dec2bin [decimal], help";
+            }
+            else {
+                return "Unknown command. Type 'help' for available commands.";
+            }
         }
 
-        function displayResult(message) {
-            document.getElementById("result").textContent = message;
+        function displayOutput(text) {
+            const outputDiv = document.createElement("div");
+            outputDiv.className = "output";
+            outputDiv.textContent = text;
+            terminal.appendChild(outputDiv);
+            scrollToBottom();
         }
+
+        function scrollToBottom() {
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Set focus on the input field when the page loads
+        userInput.focus();
     </script>
 
 </body>
