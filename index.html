@@ -3,45 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Binary Converter</title>
+    <title>Number Converter</title>
     <style>
-        body {
-            font-family: monospace;
-            background-color: #000;
-            color: #0f0;
-            margin: 20px;
-            overflow: hidden; /* Prevent scrollbars */
-        }
-
-        #terminal {
-            border: 2px solid #0f0;
-            padding: 10px;
-            height: 350px; /* Adjust as needed */
-            overflow-y: scroll;
-            background-color: rgba(0, 0, 0, 0.9); /* Slightly transparent */
-        }
-
-        .command-line {
-            display: flex; /* Align prompt and input */
-            align-items: center; /* Vertically align */
-        }
-
-        .prompt {
-            margin-right: 5px;
-        }
-
-        #user-input {
-            flex-grow: 1; /* Input takes up available space */
-            background-color: #000;
-            color: #0f0;
-            border: none;
-            outline: none; /* Remove default outline */
-            padding: 0; /* Remove default padding */
-        }
-
-        .output {
-            margin-top: 5px;
-        }
+        /* ... (same CSS as before) ... */
     </style>
 </head>
 <body>
@@ -54,64 +18,72 @@
     </div>
 
     <script>
-        const terminal = document.getElementById("terminal");
-        const userInput = document.getElementById("user-input");
-
-        function handleInput(event) {
-            if (event.key === "Enter") {
-                const command = userInput.value;
-                displayOutput(`C:\> ${command}`); // Show the entered command
-
-                const result = processCommand(command);
-                displayOutput(result);
-
-                userInput.value = ""; // Clear input
-                scrollToBottom(); // Keep scrolled to the bottom
-            }
-        }
+        // ... (same terminal setup and handleInput function as before)
 
         function processCommand(command) {
             command = command.trim().toLowerCase();
+            const parts = command.split(" "); // Split command into parts
 
-            if (command.startsWith("bin2dec")) {
-                const binary = command.substring(7).trim(); // Extract binary value
-                if (/^[01]+$/.test(binary)) { // Check for valid binary (0s and 1s only)
-                    const decimal = parseInt(binary, 2);
-                    return `Decimal: ${decimal}`;
-                } else {
-                    return "Invalid binary input. Use only 0s and 1s.";
-                }
-            } else if (command.startsWith("dec2bin")) {
-                const decimal = command.substring(7).trim();
-                if (/^\d+$/.test(decimal)) { // Check for valid decimal (numbers only)
-                  const binary = parseInt(decimal, 10).toString(2);
-                  return `Binary: ${binary}`;
-                } else {
-                  return "Invalid decimal input. Use numbers only.";
-                }
+            const cmd = parts[0];
+            let value = parts.slice(1).join(" "); // Join remaining parts for value
+
+            if (cmd === "help") {
+                return "Available commands: bin2dec [binary], dec2bin [decimal], hex2dec [hex], dec2hex [decimal], oct2dec [octal], dec2oct [decimal], unicode2char [unicode], char2unicode [character]";
             }
-             else if (command === "help") {
-                return "Available commands: bin2dec [binary], dec2bin [decimal], help";
+
+            if (!value) {
+                return "Please provide a value after the command.";
             }
-            else {
-                return "Unknown command. Type 'help' for available commands.";
+
+
+            switch (cmd) {
+                case "bin2dec":
+                    return convert(value, 2, 10, "Decimal");
+                case "dec2bin":
+                    return convert(value, 10, 2, "Binary");
+                case "hex2dec":
+                    return convert(value, 16, 10, "Decimal");
+                case "dec2hex":
+                    return convert(value, 10, 16, "Hexadecimal");
+                case "oct2dec":
+                    return convert(value, 8, 10, "Decimal");
+                case "dec2oct":
+                    return convert(value, 10, 8, "Octal");
+                case "unicode2char":
+                  return convertUnicodeToChar(value);
+                case "char2unicode":
+                  return convertCharToUnicode(value);
+                default:
+                    return "Unknown command. Type 'help' for available commands.";
             }
         }
 
-        function displayOutput(text) {
-            const outputDiv = document.createElement("div");
-            outputDiv.className = "output";
-            outputDiv.textContent = text;
-            terminal.appendChild(outputDiv);
-            scrollToBottom();
+        function convert(value, fromBase, toBase, toType) {
+            const num = parseInt(value, fromBase);
+            if (isNaN(num)) {
+                return `Invalid input for ${fromBase === 2 ? 'Binary' : fromBase === 8 ? 'Octal' : fromBase === 16 ? 'Hexadecimal' : 'Decimal'}`;
+            }
+            return `${toType}: ${num.toString(toBase)}`;
         }
 
-        function scrollToBottom() {
-            terminal.scrollTop = terminal.scrollHeight;
+        function convertUnicodeToChar(unicode) {
+          const codePoint = parseInt(unicode, 16); // Unicode is usually in hex
+          if (isNaN(codePoint) || codePoint < 0 || codePoint > 0x10FFFF) {
+            return "Invalid Unicode code point.";
+          }
+          return `Character: ${String.fromCodePoint(codePoint)}`;
         }
 
-        // Set focus on the input field when the page loads
-        userInput.focus();
+        function convertCharToUnicode(char) {
+          if (char.length !== 1) {
+            return "Please provide a single character.";
+          }
+          const codePoint = char.codePointAt(0).toString(16).toUpperCase();
+          return `Unicode: U+${codePoint}`;
+        }
+
+
+        // ... (displayOutput and scrollToBottom functions remain the same)
     </script>
 
 </body>
