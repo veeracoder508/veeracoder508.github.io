@@ -132,7 +132,17 @@
         }
 
 
-        // ... (displayOutput and scrollToBottom functions remain the same)
+        function displayOutput(text) {
+            const outputDiv = document.createElement("div");
+            outputDiv.className = "output";
+            outputDiv.textContent = text;
+            terminal.appendChild(outputDiv);
+            scrollToBottom();
+        }
+
+        function scrollToBottom() {
+            terminal.scrollTop = terminal.scrollHeight;
+        }
     </script>
 
 </body>
