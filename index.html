@@ -3,101 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Converter</title>
+    <title>Number Converter</title>
     <style>
         body {
-            background-color: #000; /* Black background */
-            color: #0f0; /* Green text */
-            font-family: monospace; /* Monospace font */
+            background-color: #1e1e1e; /* PowerShell background color */
+            color: #f0f0f0; /* PowerShell text color */
+            font-family: 'Consolas', monospace; /* PowerShell font */
             padding: 20px;
-            margin: 0;
-            overflow: hidden; /* Prevents scrollbars */
         }
 
-        #console {
-            width: 95%; /* Occupy most of the width */
-            max-height: 80vh; /* Limit maximum height */
-            overflow-y: auto; /* Add vertical scroll if needed */
-            border: 1px solid #0f0; /* Green border */
+        .container {
+            background-color: #282828; /* Slightly lighter background for container */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #a0a0a0; /* Slightly lighter heading color */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"] {
+            background-color: #3c3c3c; /* Input background color */
+            color: #f0f0f0;
+            border: 1px solid #505050; /* Input border color */
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            width: calc(100% - 18px); /* Ensure input takes full width */
+        }
+
+        button {
+            background-color: #0078d7; /* PowerShell blue */
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005ba1; /* Darker blue on hover */
+        }
+
+        .results {
+            margin-top: 20px;
+            background-color: #3c3c3c; /* Results background color */
             padding: 10px;
-        }
-
-        .command-line {
-            display: flex;
-            align-items: center; /* Vertically center items */
+            border-radius: 3px;
+            white-space: pre-wrap; /* Preserve whitespace for output */
         }
 
         .prompt {
-            color: #0f0;
-            margin-right: 5px;
+          color: #6a6a6a;  /* Slightly lighter for the prompt */
+          margin-bottom: 5px;
         }
-
-        #input {
-            background-color: transparent; /* Transparent background */
-            color: #0f0;
-            border: none;
-            outline: none;
-            flex-grow: 1; /* Input takes up available space */
-            font-family: monospace;
-            font-size: inherit;
-            padding: 0;
-            min-width: 0; /* Prevents input from shrinking too much */
-        }
-
         .output {
-            margin-top: 5px;
+          color: #f0f0f0;
         }
+
     </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Number Converter</h1>
 
-<div id="console">
-    <div class="command-line">
-        <span class="prompt">C:\></span>
-        <input type="text" id="input" autofocus>
+        <label for="decimalInput">Decimal:</label>
+        <input type="number" id="decimalInput" placeholder="Enter decimal number">
+
+        <button onclick="convertNumber()">Convert</button>
+
+        <div class="results">
+            <div class="prompt">PS C:\> </div>
+            <div class="output" id="binaryOutput"></div>
+            <div class="prompt">PS C:\> </div>
+            <div class="output" id="hexOutput"></div>
+            <div class="prompt">PS C:\> </div>
+            <div class="output" id="octalOutput"></div>
+        </div>
     </div>
-</div>
 
-<script>
-    const consoleDiv = document.getElementById('console');
-    const inputField = document.getElementById('input');
+    <script>
+        function convertNumber() {
+            const decimalInput = document.getElementById("decimalInput");
+            const binaryOutput = document.getElementById("binaryOutput");
+            const hexOutput = document.getElementById("hexOutput");
+            const octalOutput = document.getElementById("octalOutput");
 
-    inputField.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            const command = inputField.value;
-            consoleDiv.innerHTML += `<div class="output">C:\> ${command}</div>`; // Display command
+            const decimalValue = parseInt(decimalInput.value);
 
-            const output = processCommand(command);
-            consoleDiv.innerHTML += `<div class="output">${output}</div>`; // Display output
-
-            inputField.value = ''; // Clear input field
-            consoleDiv.scrollTop = consoleDiv.scrollHeight; // Scroll to bottom
-        }
-    });
-
-    function processCommand(command) {
-        command = command.trim();
-        if (command === "") return ""; // Handle empty commands
-
-        const parts = command.split(" ");
-        const cmd = parts[0].toLowerCase();
-        const arg = parts.slice(1).join(" ");
-
-        try {
-            switch (cmd) {
-                case "bin": return parseInt(arg, 2).toString(10);
-                case "hex": return parseInt(arg, 16).toString(10);
-                case "oct": return parseInt(arg, 8).toString(10);
-                case "unicode": return String.fromCharCode(parseInt(arg));
-                default: return "Invalid command. Try 'bin', 'hex', 'oct', or 'unicode'.";
+            if (isNaN(decimalValue)) {
+                binaryOutput.textContent = "Invalid input. Please enter a number.";
+                hexOutput.textContent = "";
+                octalOutput.textContent = "";
+                return;
             }
-        } catch (error) {
-            return "Invalid input. Please provide a valid number.";
+
+            binaryOutput.textContent = decimalValue.toString(2);
+            hexOutput.textContent = decimalValue.toString(16).toUpperCase(); // Uppercase for hex
+            octalOutput.textContent = decimalValue.toString(8);
         }
-    }
-
-
-</script>
-
+    </script>
 </body>
 </html>
