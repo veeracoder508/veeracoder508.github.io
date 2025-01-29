@@ -1,8 +1,8 @@
-_ this error message is by the website_
+_this error message is by the website_
 # an error occurred 
 ## index.html
 ### method 1
-if it shows this page then at the end of the URL try typing what is given below
+_if it shows this page then at the end of the URL try typing what is given below_
 ### method 2
 refresh the page or wait for _ten minutes_
 ### method 3 
