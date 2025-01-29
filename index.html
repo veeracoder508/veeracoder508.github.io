@@ -1,156 +1,142 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>BINARY CONVERTER BY VEERARAVAN</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary Converter</title>
     <style>
         body {
-            font-family: sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f0f0f0;
+            font-family: monospace;
+            background-color: #000;
+            color: #0f0;
+            margin: 20px;
         }
 
-        header {
-            background-color: #4285f4;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-        }
-
-        h1 {
-            margin: 0;
-        }
-
-        main {
-            max-width: 600px;
-            margin: 20px auto;
+        #container {
+            border: 2px solid #0f0;
             padding: 20px;
-            background-color: white;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            background-color: rgba(0, 0, 0, 0.8);
         }
 
         label {
-            display: block;
+            display: block; /* Labels on separate lines */
             margin-bottom: 5px;
         }
 
         input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
-        }
-
-        select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
+            width: calc(100% - 20px); /* Full width, accounting for padding */
+            padding: 8px;
+            margin-bottom: 10px;
+            background-color: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
         }
 
         button {
-            background-color: #4285f4;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 3px;
+            padding: 8px 16px;
+            background-color: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
             cursor: pointer;
         }
 
         #result {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 3px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        /* Matrix Rain Effect (Optional) */
+        #matrix {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .drop {
+            position: absolute;
+            background-color: #0f0;
+            width: 1px;
+            height: var(--length);
+            animation: rain var(--speed) linear infinite;
+        }
+
+        @keyframes rain {
+            0% { transform: translateY(-100vh); }
+            100% { transform: translateY(100vh); }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>BINARY CONVERTER BY VEERARAVAN</h1>
-    </header>
+    <h1>Binary Converter</h1>
 
-    <main>
-        <label for="input">Enter Value:</label>
-        <input type="text" id="input" placeholder="Enter value (e.g., 101, 1A, 12)">
+    <div id="container">
+        <label for="decimalInput">Decimal:</label>
+        <input type="text" id="decimalInput">
 
-        <label for="from">Convert From:</label>
-        <select id="from">
-            <option value="binary">Binary</option>
-            <option value="decimal">Decimal</option>
-            <option value="hexadecimal">Hexadecimal</option>
-            <option value="octal">Octal</option>
-        </select>
+        <button onclick="convertDecimalToBinary()">Convert to Binary</button>
 
-        <label for="to">Convert To:</label>
-        <select id="to">
-            <option value="binary">Binary</option>
-            <option value="decimal">Decimal</option>
-            <option value="hexadecimal">Hexadecimal</option>
-            <option value="octal">Octal</option>
-        </select>
+        <label for="binaryInput">Binary:</label>
+        <input type="text" id="binaryInput">
 
-        <button onclick="convert()">Convert</button>
+        <button onclick="convertBinaryToDecimal()">Convert to Decimal</button>
 
         <div id="result"></div>
-    </main>
+    </div>
+
+    <div id="matrix"></div>
 
     <script>
-        function convert() {
-            const inputValue = document.getElementById("input").value;
-            const from = document.getElementById("from").value;
-            const to = document.getElementById("to").value;
-            const resultDiv = document.getElementById("result");
+        function convertDecimalToBinary() {
+            const decimalInput = document.getElementById("decimalInput");
+            const binaryInput = document.getElementById("binaryInput");
+            const decimal = parseInt(decimalInput.value);
 
-            let result;
-
-            if (from === "binary") {
-                if (to === "decimal") {
-                    result = parseInt(inputValue, 2);
-                } else if (to === "hexadecimal") {
-                    result = parseInt(inputValue, 2).toString(16).toUpperCase();
-                } else if (to === "octal") {
-                    result = parseInt(inputValue, 2).toString(8);
-                } else {
-                    result = inputValue; // No conversion needed
-                }
-            } else if (from === "decimal") {
-                if (to === "binary") {
-                    result = parseInt(inputValue).toString(2);
-                } else if (to === "hexadecimal") {
-                    result = parseInt(inputValue).toString(16).toUpperCase();
-                } else if (to === "octal") {
-                    result = parseInt(inputValue).toString(8);
-                } else {
-                    result = inputValue; // No conversion needed
-                }
-            } else if (from === "hexadecimal") {
-                if (to === "binary") {
-                    result = parseInt(inputValue, 16).toString(2);
-                } else if (to === "decimal") {
-                    result = parseInt(inputValue, 16);
-                } else if (to === "octal") {
-                    result = parseInt(inputValue, 16).toString(8);
-                } else {
-                    result = inputValue; // No conversion needed
-                }
-            } else if (from === "octal") {
-                if (to === "binary") {
-                    result = parseInt(inputValue, 8).toString(2);
-                } else if (to === "decimal") {
-                    result = parseInt(inputValue, 8);
-                } else if (to === "hexadecimal") {
-                    result = parseInt(inputValue, 8).toString(16).toUpperCase();
-                } else {
-                    result = inputValue; // No conversion needed
-                }
+            if (isNaN(decimal)) {
+                displayResult("Invalid decimal input.");
+                return;
             }
 
-            resultDiv.textContent = "Result: " + result;
+            const binary = decimal.toString(2);
+            binaryInput.value = binary;
+            displayResult(""); // Clear any previous messages
+        }
+
+        function convertBinaryToDecimal() {
+            const decimalInput = document.getElementById("decimalInput");
+            const binaryInput = document.getElementById("binaryInput");
+            const binary = binaryInput.value;
+
+            if (!/^[01]+$/.test(binary)) { // Check for valid binary (0s and 1s only)
+                displayResult("Invalid binary input.");
+                return;
+            }
+
+
+            const decimal = parseInt(binary, 2);
+            decimalInput.value = decimal;
+            displayResult(""); // Clear any previous messages
+        }
+
+        function displayResult(message) {
+            const resultDiv = document.getElementById("result");
+            resultDiv.textContent = message;
+        }
+
+                // Matrix Rain Effect (Optional)
+        const matrix = document.getElementById("matrix");
+        const numDrops = window.innerWidth / 10; // Adjust density
+        for (let i = 0; i < numDrops; i++) {
+            const drop = document.createElement("div");
+            drop.className = "drop";
+            drop.style.left = `${i * 10}px`; // Horizontal position
+            drop.style.setProperty("--length", `${Math.random() * 100}vh`); // Random length
+            drop.style.setProperty("--speed", `${Math.random() * 2 + 1}s`); // Random speed
+            matrix.appendChild(drop);
         }
     </script>
 
