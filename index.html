@@ -6,144 +6,135 @@
     <title>Number Converter</title>
     <style>
         body {
-            font-family: monospace;
-            background-color: #000;
-            color: #0f0;
-            margin: 20px;
+            background-color: #000; /* Black background */
+            color: #0f0; /* Green text */
+            font-family: monospace; /* Monospace font for command prompt feel */
+            padding: 20px;
+            margin: 0; /* Remove default margins */
             overflow: hidden; /* Prevent scrollbars */
         }
 
         #terminal {
+            width: 80%; /* Adjust width as needed */
+            margin: 0 auto;
             border: 2px solid #0f0;
             padding: 10px;
-            height: 350px; /* Adjust as needed */
-            overflow-y: scroll;
-            background-color: rgba(0, 0, 0, 0.9); /* Slightly transparent */
+            overflow-y: auto; /* Add scrollbar if content overflows */
+            height: 400px; /* Set a fixed height or adjust as needed */
         }
 
-        .command-line {
-            display: flex; /* Align prompt and input */
-            align-items: center; /* Vertically align */
+        .command {
+            margin-bottom: 5px;
         }
 
         .prompt {
+            display: inline-block;
             margin-right: 5px;
-        }
-        #user-input {
-            flex-grow: 1; /* Input takes up available space */
-            background-color: #000;
-            color: #0f0;
-            border: none;
-            outline: none; /* Remove default outline */
-            padding: 0; /* Remove default padding */
         }
 
         .output {
-            margin-top: 5px;
+            margin-left: 20px; /* Indent output */
+        }
+
+        input[type="text"] {
+            background-color: #000;
+            color: #0f0;
+            border: none;
+            font-family: monospace;
+            padding: 2px;
+        }
+
+        select {
+          background-color: #000;
+          color: #0f0;
+          border: none;
+          font-family: monospace;
+        }
+
+        button {
+            background-color: #000;
+            color: #0f0;
+            border: 1px solid #0f0;
+            font-family: monospace;
+            padding: 5px 10px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div id="terminal">
-        <div class="command-line">
-            <span class="prompt">C:\></span>
-            <input type="text" id="user-input" autofocus onkeydown="handleInput(event)">
-        </div>
+<div id="terminal">
+    <div class="command">
+        <span class="prompt">&gt; Enter number:</span>
+        <input type="text" id="numberInput">
+        <select id="inputType">
+            <option value="decimal">Decimal</option>
+            <option value="binary">Binary</option>
+            <option value="hex">Hexadecimal</option>
+            <option value="octal">Octal</option>
+            <option value="unicode">Unicode</option>
+        </select>
+        <button onclick="convertNumber()">Convert</button>
+    </div>
+    <div class="command">
+        <span class="prompt">&gt; Binary:</span>
+        <span class="output" id="binaryOutput"></span>
+    </div>
+    <div class="command">
+        <span class="prompt">&gt; Hexadecimal:</span>
+        <span class="output" id="hexOutput"></span>
+    </div>
+    <div class="command">
+        <span class="prompt">&gt; Octal:</span>
+        <span class="output" id="octalOutput"></span>
+    </div>
+    <div class="command">
+        <span class="prompt">&gt; Unicode:</span>
+        <span class="output" id="unicodeOutput"></span>
     </div>
 
-    <script>
-        const terminal = document.getElementById("terminal");
-        const userInput = document.getElementById("user-input");
+</div>
 
-        function handleInput(event) {
-            if (event.key === "Enter") {
-                const command = userInput.value;
-                displayOutput(`C:\> ${command}`); // Show the entered command
 
-                const result = processCommand(command);
-                displayOutput(result);
+<script>
+    function convertNumber() {
+        const numberInput = document.getElementById("numberInput").value;
+        const inputType = document.getElementById("inputType").value;
 
-                userInput.value = ""; // Clear input
-                scrollToBottom(); // Keep scrolled to the bottom
-            }
+        let decimalValue;
+
+        if (inputType === "decimal") {
+            decimalValue = parseInt(numberInput, 10);
+        } else if (inputType === "binary") {
+            decimalValue = parseInt(numberInput, 2);
+        } else if (inputType === "hex") {
+            decimalValue = parseInt(numberInput, 16);
+        } else if (inputType === "octal") {
+            decimalValue = parseInt(numberInput, 8);
+        } else if (inputType === "unicode") {
+          decimalValue = numberInput.charCodeAt(0); // Get Unicode code point.  Handles single characters.
+        } else {
+            alert("Invalid input type.");
+            return;
         }
 
-        function processCommand(command) {
-            command = command.trim().toLowerCase();
-            const parts = command.split(" "); // Split command into parts
-
-            const cmd = parts[0];
-            let value = parts.slice(1).join(" "); // Join remaining parts for value
-
-            if (cmd === "help") {
-                return "Available commands: bin2dec [binary], dec2bin [decimal], hex2dec [hex], dec2hex [decimal], oct2dec [octal], dec2oct [decimal], unicode2char [unicode], char2unicode [character]";
-            }
-
-            if (!value) {
-                return "Please provide a value after the command.";
-            }
-
-
-            switch (cmd) {
-                case "bin2dec":
-                    return convert(value, 2, 10, "Decimal");
-                case "dec2bin":
-                    return convert(value, 10, 2, "Binary");
-                case "hex2dec":
-                    return convert(value, 16, 10, "Decimal");
-                case "dec2hex":
-                    return convert(value, 10, 16, "Hexadecimal");
-                case "oct2dec":
-                    return convert(value, 8, 10, "Decimal");
-                case "dec2oct":
-                    return convert(value, 10, 8, "Octal");
-                case "unicode2char":
-                  return convertUnicodeToChar(value);
-                case "char2unicode":
-                  return convertCharToUnicode(value);
-                default:
-                    return "Unknown command. Type 'help' for available commands.";
-            }
+        if (isNaN(decimalValue)) {
+            alert("Invalid number input.");
+            return;
         }
 
-        function convert(value, fromBase, toBase, toType) {
-            const num = parseInt(value, fromBase);
-            if (isNaN(num)) {
-                return `Invalid input for ${fromBase === 2 ? 'Binary' : fromBase === 8 ? 'Octal' : fromBase === 16 ? 'Hexadecimal' : 'Decimal'}`;
-            }
-            return `${toType}: ${num.toString(toBase)}`;
-        }
-
-        function convertUnicodeToChar(unicode) {
-          const codePoint = parseInt(unicode, 16); // Unicode is usually in hex
-          if (isNaN(codePoint) || codePoint < 0 || codePoint > 0x10FFFF) {
-            return "Invalid Unicode code point.";
-          }
-          return `Character: ${String.fromCodePoint(codePoint)}`;
-        }
-
-        function convertCharToUnicode(char) {
-          if (char.length !== 1) {
-            return "Please provide a single character.";
-          }
-          const codePoint = char.codePointAt(0).toString(16).toUpperCase();
-          return `Unicode: U+${codePoint}`;
-        }
+        const binaryOutput = decimalValue.toString(2);
+        const hexOutput = decimalValue.toString(16).toUpperCase(); // Convert to uppercase hex
+        const octalOutput = decimalValue.toString(8);
+        const unicodeOutput = String.fromCharCode(decimalValue);  // Convert back to character
 
 
-        function displayOutput(text) {
-            const outputDiv = document.createElement("div");
-            outputDiv.className = "output";
-            outputDiv.textContent = text;
-            terminal.appendChild(outputDiv);
-            scrollToBottom();
-        }
-
-        function scrollToBottom() {
-            terminal.scrollTop = terminal.scrollHeight;
-        }
-    </script>
+        document.getElementById("binaryOutput").textContent = binaryOutput;
+        document.getElementById("hexOutput").textContent = hexOutput;
+        document.getElementById("octalOutput").textContent = octalOutput;
+        document.getElementById("unicodeOutput").textContent = unicodeOutput;
+    }
+</script>
 
 </body>
 </html>
