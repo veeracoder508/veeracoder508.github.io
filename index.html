@@ -53,7 +53,21 @@
     </div>
 
     <script>
-        // ... (same terminal setup and handleInput function as before)
+        const terminal = document.getElementById("terminal");
+        const userInput = document.getElementById("user-input");
+
+        function handleInput(event) {
+            if (event.key === "Enter") {
+                const command = userInput.value;
+                displayOutput(`C:\> ${command}`); // Show the entered command
+
+                const result = processCommand(command);
+                displayOutput(result);
+
+                userInput.value = ""; // Clear input
+                scrollToBottom(); // Keep scrolled to the bottom
+            }
+        }
 
         function processCommand(command) {
             command = command.trim().toLowerCase();
