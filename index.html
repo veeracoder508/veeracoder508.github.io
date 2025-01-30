@@ -1,10 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Simple Programming Language Interpreter</title>
+<title>Simple BASIC Interpreter</title>
 <style>
 body {
   font-family: monospace;
+}
+#code {
+  width: 80%;
+  height: 200px;
+  border: 1px solid #ccc;
+  font-family: monospace;
+  padding: 5px;
 }
 #output {
   margin-top: 10px;
@@ -13,112 +20,73 @@ body {
   overflow-y: scroll;
   height: 200px;
 }
-#console {
-    border: 1px solid #ccc;
-    padding: 5px;
-    background-color: #f0f0f0; /* Light gray background for console */
-}
 </style>
 </head>
 <body>
 
-<h1>Simple Programming Language Interpreter</h1>
+<h1>Simple BASIC Interpreter</h1>
 
-<div id="console">
-<label for="code">Enter code:</label><br>
-<textarea id="code" rows="5" cols="50"></textarea><br>
-<button onclick="execute()">Run</button>
-</div>
+<textarea id="code" placeholder="Enter your BASIC code here..."></textarea><br>
+<button onclick="runCode()">Run</button>
 
 <div id="output"></div>
 
 <script>
-function execute() {
-  const codeInput = document.getElementById("code");
-  const code = codeInput.value;
+function runCode() {
+  const code = document.getElementById("code").value;
   const outputDiv = document.getElementById("output");
+  outputDiv.innerHTML = ""; // Clear previous output
 
-  if (code.trim().toUpperCase() === "HELP") {
-    outputDiv.innerHTML += "Example: PRINT(\"Hello, world!\")<br>";
-    outputDiv.innerHTML += "Supported commands:<br>" +
-                         "PRINT(message): Prints the message to the output.<br>" +
-                         "LET variable = value: Assigns a value to a variable.<br>" +
-                         "IF condition: Starts a conditional block. <br>" +
-                         "ENDIF: Ends a conditional block. <br>" +
-                         "Example IF condition: IF x > 5 <br>" +
-                         "Variables are case-sensitive.<br>";
-    codeInput.value = "";
-    return;
-  }
+  const lines = code.split("\n");
+  const variables = {}; // Store variables
 
-  try {
-      const lines = code.split('\n');
-      let variables = {}; // Store variables
-      let inIfBlock = false;
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (trimmedLine === "") continue; // Skip empty lines
 
-      for (const line of lines) {
-          const trimmedLine = line.trim();
-          if (trimmedLine === "") continue; // Skip empty lines
+    try {
+      const parts = trimmedLine.split(" ");
+      const command = parts[0].toUpperCase();
 
-          if (trimmedLine.startsWith("PRINT(")) {
-              const message = trimmedLine.substring(6, trimmedLine.length - 1);
-              outputDiv.innerHTML += message + "<br>";
-          } else if (trimmedLine.startsWith("LET ")) {
-              const parts = trimmedLine.substring(4).split("=");
-              const variable = parts[0].trim();
-              const value = parts[1].trim();
-              variables[variable] = value;
-          } else if (trimmedLine.startsWith("IF ")) {
-              const condition = trimmedLine.substring(3).trim();
-              const parts = condition.split(" ");
-              const varName = parts[0];
-              const operator = parts[1];
-              const compareValue = parts[2];
-
-              if (!(varName in variables)) {
-                  throw new Error("Variable '" + varName + "' not defined.");
-              }
-
-              const varValue = variables[varName];
-              let conditionResult;
-
-              if (operator === ">") {
-                  conditionResult = parseFloat(varValue) > parseFloat(compareValue);
-              } else if (operator === "<") {
-                  conditionResult = parseFloat(varValue) < parseFloat(compareValue);
-              } else if (operator === ">=") {
-                  conditionResult = parseFloat(varValue) >= parseFloat(compareValue);
-              } else if (operator === "<=") {
-                  conditionResult = parseFloat(varValue) <= parseFloat(compareValue);
-              } else if (operator === "==") {
-                  conditionResult = varValue == compareValue;
-              } else {
-                  throw new Error("Invalid operator: " + operator);
-              }
-
-              inIfBlock = conditionResult; // Set if block state
-          } else if (trimmedLine === "ENDIF") {
-              inIfBlock = false;
-          } else if (inIfBlock) {
-              // Execute code inside the if block (currently only PRINT)
-              if (trimmedLine.startsWith("PRINT(")) {
-                  const message = trimmedLine.substring(6, trimmedLine.length - 1);
-                  outputDiv.innerHTML += message + "<br>";
-              }
-          }
-
-          else {
-              throw new Error("Invalid command: " + trimmedLine);
-          }
+      switch (command) {
+        case "PRINT":
+          const value = evaluate(trimmedLine.substring(command.length).trim(), variables);
+          outputDiv.innerHTML += value + "<br>";
+          break;
+        case "LET": // Example: LET X = 10
+          const assignmentParts = trimmedLine.substring(command.length).trim().split("=");
+          const varName = assignmentParts[0].trim();
+          const varValue = evaluate(assignmentParts[1].trim(), variables);
+          variables[varName] = varValue;
+          break;
+        // Add more commands (e.g., INPUT, GOTO, IF, etc.) here
+        default:
+          outputDiv.innerHTML += "Unknown command: " + command + "<br>";
       }
-  } catch (error) {
-    outputDiv.innerHTML += "Error: " + error.message + "<br>";
+    } catch (error) {
+      outputDiv.innerHTML += "Error: " + error.message + "<br>";
+      break; // Stop execution on error
+    }
   }
-
-  codeInput.value = ""; // Clear input
-  outputDiv.scrollTop = outputDiv.scrollHeight;
 }
 
+
+function evaluate(expression, variables) {
+    expression = expression.trim();
+    if (/^".*"$/.test(expression)) { // String literal
+        return expression.slice(1, -1); // Remove quotes
+    } else if (/^[0-9.]+$/.test(expression)) { // Number
+        return parseFloat(expression);
+    } else if (variables.hasOwnProperty(expression)) { // Variable
+        return variables[expression];
+    } else { // Simple expression evaluation (add more operators as needed)
+        try {
+            return eval(expression); // Use eval cautiously!  Consider a safer expression parser.
+        } catch (e) {
+            throw new Error("Invalid expression: " + expression);
+        }
+    }
+}
 
 </script>
 
