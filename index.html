@@ -1,227 +1,242 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Simple BASIC Interpreter Veera</title>
+<title>QBasic-like Interpreter</title>
 <style>
-body {
-  font-family: monospace;
-}
-#code {
-  width: 80%;
-  height: 200px;
-  border: 1px solid #ccc;
-  font-family: monospace;
-  padding: 5px;
-}
-#output {
-  margin-top: 10px;
-  border: 1px solid #ccc;
-  padding: 5px;
-  overflow-y: scroll;
-  height: 200px;
-}
+body { font-family: monospace; }
+#output { border: 1px solid #ccc; padding: 5px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
 
-<h1>Simple BASIC Interpreter Veera</h1>
+<h1>QBasic-like Interpreter</h1>
 
-<textarea id="code" placeholder="Enter your BASIC code here..."></textarea><br>
+<textarea id="code" rows="10" cols="50">
+REM This is a QBasic-like program
+INPUT "Enter your name: ", name$
+PRINT "Hello, " + name$ + "!"
+
+DIM numbers(5)
+FOR i = 1 TO 5
+  numbers(i) = i * 2
+NEXT i
+
+PRINT "Numbers array:"
+FOR i = 1 TO 5
+  PRINT numbers(i)
+NEXT i
+
+INPUT "Enter a number: ", num
+IF num > 10 THEN
+  PRINT "Number is greater than 10"
+ELSEIF num = 10 THEN
+  PRINT "Number is equal to 10"
+ELSE
+  PRINT "Number is less than 10"
+END IF
+
+</textarea><br>
+
 <button onclick="runCode()">Run</button>
 
 <div id="output"></div>
 
 <script>
-let inputQueue = []; // Queue for INPUT statements
-let outputDiv;
-
 function runCode() {
   const code = document.getElementById("code").value;
-  outputDiv = document.getElementById("output");
-  outputDiv.innerHTML = "";
-  inputQueue = [];
+  const outputDiv = document.getElementById("output");
+  outputDiv.innerHTML = ""; // Clear previous output
 
-  const lines = code.split("\n");
+  // Basic interpreter logic (simplified)
   const variables = {};
-  const arrays = {}; // Store arrays
+  const arrays = {};
 
-  let lineNumber = 0; // Current line number
-  const lineLabels = {}; // Store line labels for GOTO
+  const lines = code.split('\n');
 
-  // First pass: find line labels
   for (const line of lines) {
     const trimmedLine = line.trim();
-    if (trimmedLine === "") continue;
+    if (trimmedLine.startsWith("REM")) {
+      continue; // Skip comments
+    }
 
     const parts = trimmedLine.split(" ");
-    if (parts[0].endsWith(":")) {
-        lineLabels[parts[0].slice(0, -1)] = lineNumber;
+
+    if (parts[0] === "INPUT") {
+      const prompt = parts[1].replace(/"/g, ''); // Remove quotes
+      const variableName = parts[3];
+      const inputValue = prompt("Input: " + prompt);
+      variables[variableName] = inputValue;
+
+    } else if (parts[0] === "PRINT") {
+      let output = "";
+      for (let i = 1; i < parts.length; i++) {
+          let part = parts[i];
+          if (part.startsWith("\"")) {
+              output += part.replace(/"/g, '');
+          } else if (variables[part] !== undefined) {
+              output += variables[part];
+          } else if (part === "+"){
+              output += part;
+          } else {
+              output += part; // Handle variables or strings
+          }
+      }
+
+      outputDiv.innerHTML += output + "<br>";
+
+    } else if (parts[0] === "DIM") {
+      const arrayName = parts[1].split("(")[0];
+      const arraySize = parseInt(parts[1].split("(")[1].split(")")[0]);
+      arrays[arrayName] = new Array(arraySize);
+
+    } else if (parts[0] === "FOR") {
+      const loopVar = parts[1];
+      const start = parseInt(parts[3]);
+      const end = parseInt(parts[5]);
+      let forBlock = [];
+      let inFor = true;
+      let j = lines.indexOf(trimmedLine) + 1;
+
+      while (j < lines.length) {
+          let currentLine = lines[j].trim();
+          if (currentLine.startsWith("NEXT")) {
+              inFor = false;
+              break;
+          }
+          forBlock.push(currentLine);
+          j++;
+      }
+
+      for (let i = start; i <= end; i++) {
+          variables[loopVar] = i;
+          for (const forLine of forBlock) {
+              executeLine(forLine, variables, arrays, outputDiv);
+          }
+      }
+
+    } else if (parts[0] === "IF") {
+      const condition = parts.slice(1, parts.indexOf("THEN")).join(" ");
+      const thenBlock = [];
+      let inThen = true;
+      let k = lines.indexOf(trimmedLine) + 1;
+      while (k < lines.length) {
+          let currentLine = lines[k].trim();
+          if (currentLine.startsWith("ELSEIF") || currentLine.startsWith("ELSE") || currentLine.startsWith("END IF")) {
+              inThen = false;
+              break;
+          }
+          thenBlock.push(currentLine);
+          k++;
+      }
+      const conditionValue = evaluateCondition(condition, variables);
+      if (conditionValue) {
+          for (const thenLine of thenBlock) {
+              executeLine(thenLine, variables, arrays, outputDiv);
+          }
+      }
+      // handle else if and else blocks
+      let elseIfBlock = [];
+      let elseBlock = [];
+      let inElseIf = false;
+      let inElse = false;
+      while (k < lines.length) {
+          let currentLine = lines[k].trim();
+          if (currentLine.startsWith("ELSEIF")) {
+              inElseIf = true;
+              k++;
+              while (k < lines.length) {
+                  currentLine = lines[k].trim();
+                  if (currentLine.startsWith("ELSEIF") || currentLine.startsWith("ELSE") || currentLine.startsWith("END IF")) {
+                      inElseIf = false;
+                      break;
+                  }
+                  elseIfBlock.push(currentLine);
+                  k++;
+              }
+              const elseIfCondition = currentLine.slice(currentLine.indexOf(" ") + 1, currentLine.indexOf("THEN")).trim();
+              const elseIfConditionValue = evaluateCondition(elseIfCondition, variables);
+              if (elseIfConditionValue) {
+                  for (const elseIfLine of elseIfBlock) {
+                      executeLine(elseIfLine, variables, arrays, outputDiv);
+                  }
+                  break;
+              }
+          } else if (currentLine.startsWith("ELSE")) {
+              inElse = true;
+              k++;
+              while (k < lines.length) {
+                  currentLine = lines[k].trim();
+                  if (currentLine.startsWith("END IF")) {
+                      inElse = false;
+                      break;
+                  }
+                  elseBlock.push(currentLine);
+                  k++;
+              }
+              if (inElse) {
+                  for (const elseLine of elseBlock) {
+                      executeLine(elseLine, variables, arrays, outputDiv);
+                  }
+              }
+              break;
+          }
+          k++;
+      }
+
+    } else if (parts[0].includes("(") && parts[0].includes(")")) { //Array assignment
+      const arrayName = parts[0].split("(")[0];
+      const index = parseInt(parts[0].split("(")[1].split(")")[0]);
+      const value = parseInt(parts[2]);
+      arrays[arrayName][index] = value;
     }
-    lineNumber++;
+
   }
+}
 
-  lineNumber = 0; // Reset line number for execution
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmedLine = line.trim();
-    if (trimmedLine === "") continue;
-
-    try {
-      const parts = trimmedLine.split(" ");
-      const command = parts[0].toUpperCase();
-
-      switch (command) {
-        case "REM": // Comment
-          break;
-        case "PRINT":
-          const value = evaluate(trimmedLine.substring(command.length).trim(), variables, arrays);
-          outputDiv.innerHTML += value + "<br>";
-          break;
-        case "LET":
-          const assignmentParts = trimmedLine.substring(command.length).trim().split("=");
-          const varName = assignmentParts[0].trim();
-          const varValue = evaluate(assignmentParts[1].trim(), variables, arrays);
-          variables[varName] = varValue;
-          break;
-        case "INPUT":
-          const prompt = trimmedLine.substring(command.length).trim();
-          const inputValue = prompt ? window.prompt(prompt) : window.prompt("Enter value:");
-          if (inputValue === null) { // Handle cancel
-              throw new Error("Input cancelled.");
-          }
-          inputQueue.push(inputValue);
-          break;
-        case "GOTO":
-            const label = parts[1];
-            if (lineLabels.hasOwnProperty(label)) {
-                i = lineLabels[label] - 1; // -1 because the loop increments i
+function executeLine(line, variables, arrays, outputDiv) {
+    const parts = line.split(" ");
+    if (parts[0] === "PRINT") {
+        let output = "";
+        for (let i = 1; i < parts.length; i++) {
+            let part = parts[i];
+            if (part.startsWith("\"")) {
+                output += part.replace(/"/g, '');
+            } else if (variables[part] !== undefined) {
+                output += variables[part];
+            } else if (part === "+"){
+                output += part;
             } else {
-                throw new Error("Label not found: " + label);
+                output += part; // Handle variables or strings
             }
-            break;
-        case "IF":
-            const condition = trimmedLine.substring(command.length).trim();
-            const conditionResult = evaluate(condition, variables, arrays);
-            if (conditionResult) {
-                // Continue to the next statement (no ELSE implemented yet)
-            } else {
-                // Skip to the next line or a GOTO if present.
-                if (parts.includes("GOTO")) {
-                    const gotoIndex = parts.indexOf("GOTO") + 1;
-                    const label = parts[gotoIndex];
-                    if (lineLabels.hasOwnProperty(label)) {
-                        i = lineLabels[label] - 1;
-                    } else {
-                        throw new Error("Label not found: " + label);
-                    }
-                } else {
-                    // Find the next ELSE or ENDIF at the same IF level (not implemented yet)
-                    let elseFound = false;
-                    let endifFound = false;
-                    let ifLevel = 1;
-                    for (let j = i + 1; j < lines.length; j++) {
-                        const nextLine = lines[j].trim();
-                        if (nextLine.startsWith("IF")) {
-                            ifLevel++;
-                        } else if (nextLine.startsWith("ENDIF")) {
-                            ifLevel--;
-                            if (ifLevel === 0) {
-                                endifFound = true;
-                                i = j;
-                                break;
-                            }
-                        } else if (nextLine.startsWith("ELSE") && ifLevel === 1) {
-                            elseFound = true;
-                            i = j;
-                            break;
-                        }
-                    }
-                    if (!elseFound && !endifFound) {
-                        i = lines.length; // Exit the loop if no ELSE or ENDIF is found
-                    }
-                }
-            }
-            break;
-        case "FOR":
-          const forParts = trimmedLine.substring(command.length).trim().split("=");
-          const loopVar = forParts[0].trim();
-          const rangeParts = forParts[1].split("TO");
-          let start = evaluate(rangeParts[0].trim(), variables, arrays);
-          const end = evaluate(rangeParts[1].trim(), variables, arrays);
-          variables[loopVar] = start;
+        }
 
-          let forLoopLines = [];
-          let forLoopEnd = false;
-          let k = i + 1;
+        outputDiv.innerHTML += output + "<br>";
+    } else if (parts[0].includes("(") && parts[0].includes(")")) { //Array assignment
+        const arrayName = parts[0].split("(")[0];
+        const index = parseInt(parts[0].split("(")[1].split(")")[0]);
+        const value = parseInt(parts[2]);
+        arrays[arrayName][index] = value;
+    }
+}
 
-          while(k < lines.length) {
-            const nextLine = lines[k].trim();
-            if (nextLine.startsWith("NEXT")) {
-                forLoopEnd = true;
-                break;
-            }
-            forLoopLines.push(nextLine);
-            k++;
-          }
-            if (!forLoopEnd){
-                throw new Error("NEXT without FOR");
-            }
-          for (; variables[loopVar] <= end; variables[loopVar]++) {
-                for (const forLine of forLoopLines){
-                    const forLineParts = forLine.split(" ");
-                    const forCommand = forLineParts[0].toUpperCase();
-                    switch (forCommand) {
-                        case "REM": // Comment
-                          break;
-                        case "PRINT":
-                          const value = evaluate(forLine.substring(forCommand.length).trim(), variables, arrays);
-                          outputDiv.innerHTML += value + "<br>";
-                          break;
-                        case "LET":
-                          const assignmentParts = forLine.substring(forCommand.length).trim().split("=");
-                          const varName = assignmentParts[0].trim();
-                          const varValue = evaluate(assignmentParts[1].trim(), variables, arrays);
-                          variables[varName] = varValue;
-                          break;
-                        case "INPUT":
-                          const prompt = forLine.substring(forCommand.length).trim();
-                          const inputValue = prompt ? window.prompt(prompt) : window.prompt("Enter value:");
-                          if (inputValue === null) { // Handle cancel
-                              throw new Error("Input cancelled.");
-                          }
-                          inputQueue.push(inputValue);
-                          break;
-                        case "IF":
-                            const condition = forLine.substring(forCommand.length).trim();
-                            const conditionResult = evaluate(condition, variables, arrays);
-                            if (conditionResult) {
-                                // Continue to the next statement (no ELSE implemented yet)
-                            } else {
-                                // Skip to the next line or a GOTO if present.
-                                if (forLineParts.includes("GOTO")) {
-                                    const gotoIndex = forLineParts.indexOf("GOTO") + 1;
-                                    const label = forLineParts[gotoIndex];
-                                    if (lineLabels.hasOwnProperty(label)) {
-                                        k = lineLabels[label] - 1;
-                                    } else {
-                                        throw new Error("Label not found: " + label);
-                                    }
-                                } else {
-                                    // Find the next ELSE or ENDIF at the same IF level (not implemented yet)
-                                    let elseFound = false;
-                                    let endifFound = false;
-                                    let ifLevel = 1;
-                                    for (let j = k + 1; j < lines.length; j++) {
-                                        const nextLine = lines[j].trim();
-                                        if (nextLine.startsWith("IF")) {
-                                            ifLevel++;
-                                        } else if (nextLine.startsWith("ENDIF")) {
-                                            ifLevel--;
-                                            if (ifLevel === 0) {
-                                                endifFound = true;
-                                                k = j;
-                                                break;
-                                            }
-                                        } else if (nextLine.startsWith("ELSE") && ifLevel === 1) {
-                                            elseFound
+function evaluateCondition(condition, variables) {
+  // Very basic condition evaluation (expand as needed)
+    let parts = condition.split(" ");
+    let left = parts[0];
+    let operator = parts[1];
+    let right = parts[2];
+    if (variables[left] !== undefined) {
+        left = variables[left];
+    }
+    if (variables[right] !== undefined) {
+        right = variables[right];
+    }
+
+    if (operator === ">") {
+        return parseFloat(left) > parseFloat(right);
+    } else if (operator === "=") {
+        return parseFloat(left) === parseFloat(right);
+    } else if (operator === "<") {
+        return parseFloat(left) < parseFloat(right);
+    }
+    return false; // Default
