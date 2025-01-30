@@ -1,204 +1,189 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>QBasic in HTML</title>
+<title>PowerShell Converter</title>
 <style>
-body { font-family: monospace; background-color: #000; color: #0f0; }
-#output { white-space: pre-wrap; } /* Preserve whitespace for QBasic-like output */
+body {
+    font-family: Consolas, monospace; /* PowerShell font */
+    background-color: #012456; /* PowerShell blue */
+    color: #f0f0f0; /* Light gray text */
+    padding: 20px;
+}
+
+#container {
+    width: 600px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    padding: 20px;
+    background-color: #001f3f; /* Darker blue for container */
+    border-radius: 5px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+select, input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    background-color: #003366; /* Slightly darker input background*/
+    color: #f0f0f0;
+    border: 1px solid #0056b3; /* Lighter border */
+    border-radius: 3px;
+}
+
+button {
+    background-color: #0078d7; /* PowerShell blue button */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#output {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #000; /* Black output background */
+    color: #0f0; /* Green output text (like a console) */
+    border-radius: 5px;
+    white-space: pre-wrap; /* Preserve whitespace */
+    overflow-y: auto; /* Add scroll if needed */
+    max-height: 200px; /* Set a max height */
+}
+
+/* Optional: Add a little "PS>" prompt */
+#output::before {
+    content: "PS> ";
+}
+
 </style>
 </head>
 <body>
 
-<h1>QBasic in HTML</h1>
+<div id="container">
+    <h1>PowerShell Converter</h1>
 
-<textarea id="code" rows="20" cols="60">
-REM This is a QBasic-like program
+    <label for="inputType">Input Type:</label>
+    <select id="inputType">
+        <option value="binary">Binary</option>
+        <option value="hex">Hexadecimal</option>
+        <option value="octal">Octal</option>
+        <option value="decimal">Decimal</option>
+        <option value="string">String</option>
+    </select>
 
-INPUT "Enter your name: ", name$
+    <label for="inputValue">Input Value:</label>
+    <input type="text" id="inputValue">
 
-PRINT "Hello, " + name$ + "!"
+    <label for="outputType">Output Type:</label>
+    <select id="outputType">
+        <option value="binary">Binary</option>
+        <option value="hex">Hexadecimal</option>
+        <option value="octal">Octal</option>
+        <option value="decimal">Decimal</option>
+        <option value="string">String</option>
+    </select>
 
-DIM numbers(5)
+    <button onclick="convert()">Convert</button>
 
-FOR i = 1 TO 5
-  INPUT "Enter a number: ", num
-  numbers(i) = num
-NEXT i
-
-PRINT "The numbers you entered are:"
-
-FOR i = 1 TO 5
-  PRINT numbers(i)
-NEXT i
-
-sum = 0
-FOR i = 1 TO 5
-  sum = sum + numbers(i)
-NEXT i
-
-PRINT "The sum of the numbers is: " + STR$(sum)
-
-IF sum > 10 THEN
-  PRINT "The sum is greater than 10."
-ELSE
-  PRINT "The sum is not greater than 10."
-END IF
-
-</textarea><br>
-
-<button onclick="runCode()">Run</button>
-
-<div id="output"></div>
+    <div id="output"></div>
+</div>
 
 <script>
-function runCode() {
-  const code = document.getElementById("code").value;
-  const outputDiv = document.getElementById("output");
-  outputDiv.innerHTML = ""; // Clear previous output
+function convert() {
+    const inputValue = document.getElementById("inputValue").value;
+    const inputType = document.getElementById("inputType").value;
+    const outputType = document.getElementById("outputType").value;
+    const outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = ""; // Clear previous output
 
-  // Basic QBasic-like interpreter (very simplified)
-  const variables = {};
-  const arrays = {};
 
-  const lines = code.split("\n");
+    let decimalValue;
 
-  for (const line of lines) {
-    const trimmedLine = line.trim();
-    if (trimmedLine.startsWith("REM")) continue; // Skip comments
-
-    //Very basic parsing, prone to errors with complex QBasic
-    const parts = trimmedLine.split(" "); //Split by spaces (Very basic)
-    const command = parts[0].toUpperCase();
-
-    switch (command) {
-      case "INPUT":
-        const prompt = parts[1].replace(/"/g, ""); // Remove quotes
-        const varName = parts[3].replace("$",""); //Get variable name
-        const inputValue = prompt; //In a real implementation prompt would be shown and get from user
-        variables[varName] = inputValue;
-        outputDiv.innerHTML += prompt + "<br>"; //Simulate input prompt
-        break;
-      case "PRINT":
-        let printValue = "";
-          for (let i = 1; i < parts.length; i++) {
-                printValue += parts[i] + " ";
-          }
-
-        //Handle variables and string concatenation (very basic)
-        for (const key in variables) {
-            printValue = printValue.replace(key,variables[key]);
-        }
-        printValue = printValue.replace(/"/g, ""); // Remove quotes
-
-        outputDiv.innerHTML += printValue + "<br>";
-        break;
-      case "DIM":
-          const arrayName = parts[1].split("(")[0];
-          const arraySize = parseInt(parts[1].split("(")[1].replace(")",""));
-          arrays[arrayName] = new Array(arraySize);
-          break;
-      case "FOR":
-        //Very basic for loop, no STEP support
-        const loopVar = parts[1];
-        const start = parseInt(parts[3]);
-        const end = parseInt(parts[5]);
-        let forBlock = [];
-        let inFor = true;
-        let i = lines.indexOf(line) + 1; //Start after the FOR line
-        while(inFor && i < lines.length) {
-            let currentLine = lines[i].trim();
-            if(currentLine.startsWith("NEXT")){
-                inFor = false;
-            } else {
-                forBlock.push(currentLine);
-            }
-            i++;
-        }
-
-        for (let j = start; j <= end; j++) {
-            variables[loopVar] = j;
-            for (const forLine of forBlock) {
-                //Recursively call runCode with the for loop's code block
-                //This is a simplification and could lead to issues with nested FOR loops
-                runSubCode(forLine,variables,arrays,outputDiv);
-            }
-        }
-        break;
-      case "IF":
-          const condition = parts[1] + parts[2] + parts[3]; //Basic condition
-          const thenBlock = parts.slice(5).join(" "); // Get everything after "THEN"
-          const conditionValue = eval(condition); //Evaluate the condition
-          if (conditionValue) {
-              runSubCode(thenBlock,variables,arrays,outputDiv); //Execute the THEN block
-          }
-          break;
-      default: //Assignment (e.g., sum = sum + numbers(i))
-        //Very basic assignment, doesn't handle complex expressions
-        const assignmentVar = parts[0];
-        let assignmentValue = parts.slice(2).join(" ");
-
-        //Handle variables and arrays in assignment
-        for (const key in variables) {
-            assignmentValue = assignmentValue.replace(key,variables[key]);
-        }
-
-        //Handle Array access (very basic)
-        if(assignmentValue.includes("(")){
-             const arrayAccessParts = assignmentValue.split("(");
-             const arrayName = arrayAccessParts[0];
-             const arrayIndex = parseInt(arrayAccessParts[1].replace(")",""));
-             assignmentValue = arrays[arrayName][arrayIndex];
-        }
-
-        //Evaluate the right side of the assignment
-        const evaluatedValue = eval(assignmentValue);
-        variables[assignmentVar] = evaluatedValue;
-    }
-  }
-}
-
-function runSubCode(line,variables,arrays,outputDiv){
-    const parts = line.trim().split(" ");
-    const command = parts[0].toUpperCase();
-    switch(command){
-        case "PRINT":
-            let printValue = "";
-            for (let i = 1; i < parts.length; i++) {
-                printValue += parts[i] + " ";
-            }
-            //Handle variables and string concatenation (very basic)
-            for (const key in variables) {
-                printValue = printValue.replace(key,variables[key]);
-            }
-            printValue = printValue.replace(/"/g, ""); // Remove quotes
-
-            outputDiv.innerHTML += printValue + "<br>";
+    // Convert to decimal first
+    switch (inputType) {
+        case "binary":
+            decimalValue = parseInt(inputValue, 2);
             break;
-        //Add other cases as needed (e.g., assignment)
-        default: //Assignment (e.g., sum = sum + numbers(i))
-            //Very basic assignment, doesn't handle complex expressions
-            const assignmentVar = parts[0];
-            let assignmentValue = parts.slice(2).join(" ");
-
-            //Handle variables and arrays in assignment
-            for (const key in variables) {
-                assignmentValue = assignmentValue.replace(key,variables[key]);
+        case "hex":
+            decimalValue = parseInt(inputValue, 16);
+            break;
+        case "octal":
+            decimalValue = parseInt(inputValue, 8);
+            break;
+        case "decimal":
+            decimalValue = parseInt(inputValue);
+            break;
+        case "string":
+            decimalValue = "";
+            for (let i = 0; i < inputValue.length; i++) {
+                decimalValue += inputValue.charCodeAt(i) + " ";
             }
-
-            //Handle Array access (very basic)
-            if(assignmentValue.includes("(")){
-                 const arrayAccessParts = assignmentValue.split("(");
-                 const arrayName = arrayAccessParts[0];
-                 const arrayIndex = parseInt(arrayAccessParts[1].replace(")",""));
-                 assignmentValue = arrays[arrayName][arrayIndex];
-            }
-
-            //Evaluate the right side of the assignment
-            const evaluatedValue = eval(assignmentValue);
-            variables[assignmentVar] = evaluatedValue;
+            decimalValue = decimalValue.trim();
+            break;
     }
-}
 
+    let outputValue;
+
+    // Convert from decimal to desired output
+    switch (outputType) {
+        case "binary":
+            if (inputType === "string") {
+                outputValue = "";
+                const charCodes = decimalValue.split(" ");
+                for (const code of charCodes) {
+                    outputValue += parseInt(code).toString(2) + " ";
+                }
+                outputValue = outputValue.trim();
+            } else {
+                outputValue = decimalValue.toString(2);
+            }
+            break;
+        case "hex":
+            if (inputType === "string") {
+                outputValue = "";
+                const charCodes = decimalValue.split(" ");
+                for (const code of charCodes) {
+                    outputValue += parseInt(code).toString(16) + " ";
+                }
+                outputValue = outputValue.trim();
+            } else {
+                outputValue = decimalValue.toString(16);
+            }
+            break;
+        case "octal":
+            if (inputType === "string") {
+                outputValue = "";
+                const charCodes = decimalValue.split(" ");
+                for (const code of charCodes) {
+                    outputValue += parseInt(code).toString(8) + " ";
+                }
+                outputValue = outputValue.trim();
+            } else {
+                outputValue = decimalValue.toString(8);
+            }
+            break;
+        case "decimal":
+            outputValue = decimalValue;
+            break;
+        case "string":
+            outputValue = "";
+            if (inputType !== "string") {
+                const charCodes = decimalValue.toString().split("");
+                for (const code of charCodes) {
+                   outputValue += String.fromCharCode(parseInt(code));
+                }
+            } else {
+                outputValue = inputValue;
+            }
+            break;
+    }
+
+    outputDiv.innerHTML = outputValue;
+}
 </script>
 
 </body>
