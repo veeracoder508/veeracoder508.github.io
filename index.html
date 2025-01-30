@@ -154,6 +154,19 @@ function isBinary(num) {
 function binaryAdd(a, b) {
     return (parseInt(a, 2) + parseInt(b, 2)).toString(2);
 }
+function binarySubtract(a, b) {
+    return (parseInt(a, 2) - parseInt(b, 2)).toString(2);
+}
+function binaryMultiply(a, b) {
+    return (parseInt(a, 2) * parseInt(b, 2)).toString(2);
+}
+
+function binaryDivide(a, b) {
+    if (b === "0") {
+        return "Division by zero!";
+    }
+    return (parseInt(a, 2) / parseInt(b, 2)).toString(2);
+}
 </script>
 
 </body>
