@@ -87,7 +87,24 @@ button {
 
 
 <script>
-// ... (rest of the JavaScript code from the previous example remains the same)
+function execute() {
+  const instructionInput = document.getElementById("instruction");
+  const instruction = instructionInput.value.trim().toUpperCase(); // Convert to uppercase
+
+  const outputDiv = document.getElementById("output");
+
+  if (instruction === "HELP") {
+    outputDiv.innerHTML += "Example: ADD 0101 1010 (Adds the binary numbers 0101 and 1010)<br>";
+        outputDiv.innerHTML += "Supported Instructions: <br>"+
+        "ADD: Adds two binary numbers. <br>"+
+        "SUB: Subtracts two binary numbers. <br>"+
+        "MUL: Multiplies two binary numbers. <br>"+
+        "DIV: Divides two binary numbers. <br>"+
+        "HLT: Halts the program. <br>";
+    instructionInput.value = ""; // Clear input field
+    return;
+  }
+  
 </script>
 
 </body>
