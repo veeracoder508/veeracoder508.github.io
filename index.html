@@ -129,6 +129,31 @@ function execute() {
         default:
           result = "Invalid opcode.";
       }
+      outputDiv.innerHTML += instruction + " = " + result + "<br>";
+    } else {
+      outputDiv.innerHTML += "Invalid operands. Operands must be binary numbers.<br>";
+    }
+  } else if (opcode === "HLT") {
+      outputDiv.innerHTML += instruction + "<br>";
+  }
+  
+  else {
+    outputDiv.innerHTML += "Invalid instruction format.<br>";
+  }
+
+  instructionInput.value = ""; // Clear input field
+  outputDiv.scrollTop = outputDiv.scrollHeight; // Scroll to bottom
+}
+
+
+function isBinary(num) {
+  return /^[01]+$/.test(num);
+}
+
+// Binary arithmetic functions (example: ADD)
+function binaryAdd(a, b) {
+    return (parseInt(a, 2) + parseInt(b, 2)).toString(2);
+}
 </script>
 
 </body>
