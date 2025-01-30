@@ -104,7 +104,31 @@ function execute() {
     instructionInput.value = ""; // Clear input field
     return;
   }
-  
+  const parts = instruction.split(" ");
+  const opcode = parts[0];
+
+  if (parts.length === 3) {
+    const operand1 = parts[1];
+    const operand2 = parts[2];
+
+    if (isBinary(operand1) && isBinary(operand2)) {
+      let result;
+      switch (opcode) {
+        case "ADD":
+          result = binaryAdd(operand1, operand2);
+          break;
+        case "SUB":
+          result = binarySubtract(operand1, operand2);
+          break;
+        case "MUL":
+          result = binaryMultiply(operand1, operand2);
+          break;
+        case "DIV":
+          result = binaryDivide(operand1, operand2);
+          break;
+        default:
+          result = "Invalid opcode.";
+      }
 </script>
 
 </body>
