@@ -5,34 +5,13 @@
 <style>
 body {
   font-family: monospace;
-  background-color: #000;
-  color: #0f0;
-  padding: 20px;
 }
-
-#terminal {
-  width: 800px; /* Adjust as needed */
-  height: 400px; /* Adjust as needed */
-  overflow-y: scroll;
-  border: 2px solid #0f0;
-  padding: 10px;
-}
-
-#input-area {
-  display: flex;
+#output {
   margin-top: 10px;
-}
-
-#prompt {
-  margin-right: 5px;
-}
-
-#command-input {
-  flex-grow: 1;
-  background-color: #000;
-  color: #0f0;
-  border: none;
-  outline: none;
+  border: 1px solid #ccc;
+  padding: 5px;
+  overflow-y: scroll; /* Add scrollbar if output is too long */
+  height: 200px; /* Set a maximum height */
 }
 </style>
 </head>
@@ -40,74 +19,96 @@ body {
 
 <h1>Binary Computer Simulator</h1>
 
-<div id="terminal"></div>
+<label for="instruction">Enter instruction (e.g., ADD 0101 1010):</label>
+<input type="text" id="instruction" autofocus>
+<button onclick="execute()">Execute</button>
 
-<div id="input-area">
-  <span id="prompt">>></span>
-  <input type="text" id="command-input" autofocus>
-</div>
+<div id="output"></div>
 
 <script>
-const terminal = document.getElementById('terminal');
-const commandInput = document.getElementById('command-input');
+function execute() {
+  const instructionInput = document.getElementById("instruction");
+  const instruction = instructionInput.value.trim().toUpperCase(); // Convert to uppercase
 
-commandInput.addEventListener('keydown', function(event) {
-  if (event.key === 'Enter') {
-    const command = commandInput.value;
-    terminal.innerHTML += ">> " + command + "<br>"; // Display the command
+  const outputDiv = document.getElementById("output");
 
-    // Process the command (replace with your binary logic)
-    let output = processCommand(command);
-    terminal.innerHTML += output + "<br>";
-
-    commandInput.value = ""; // Clear the input field
-    terminal.scrollTop = terminal.scrollHeight; // Scroll to the bottom
+  if (instruction === "HELP") {
+    outputDiv.innerHTML += "Example: ADD 0101 1010 (Adds the binary numbers 0101 and 1010)<br>";
+        outputDiv.innerHTML += "Supported Instructions: <br>"+
+        "ADD: Adds two binary numbers. <br>"+
+        "SUB: Subtracts two binary numbers. <br>"+
+        "MUL: Multiplies two binary numbers. <br>"+
+        "DIV: Divides two binary numbers. <br>"+
+        "HLT: Halts the program. <br>";
+    instructionInput.value = ""; // Clear input field
+    return;
   }
-});
 
+  const parts = instruction.split(" ");
+  const opcode = parts[0];
 
-function processCommand(command) {
-  command = command.trim().toLowerCase();
+  if (parts.length === 3) {
+    const operand1 = parts[1];
+    const operand2 = parts[2];
 
-  if (command === "help") {
-      return "Available commands:  'help', 'binary <value>', 'decimal <value>' ";
-  } else if (command.startsWith("binary ")) {
-    try {
-      let decimal = parseInt(command.substring(7));
-      if (isNaN(decimal)) {
-        return "Invalid decimal input.";
+    if (isBinary(operand1) && isBinary(operand2)) {
+      let result;
+      switch (opcode) {
+        case "ADD":
+          result = binaryAdd(operand1, operand2);
+          break;
+        case "SUB":
+          result = binarySubtract(operand1, operand2);
+          break;
+        case "MUL":
+          result = binaryMultiply(operand1, operand2);
+          break;
+        case "DIV":
+          result = binaryDivide(operand1, operand2);
+          break;
+        default:
+          result = "Invalid opcode.";
       }
-      let binary = decimal.toString(2);
-      return "Binary: " + binary;
-
-    } catch (error) {
-       return "Invalid input. Please enter a valid decimal number.";
+      outputDiv.innerHTML += instruction + " = " + result + "<br>";
+    } else {
+      outputDiv.innerHTML += "Invalid operands. Operands must be binary numbers.<br>";
     }
-
-  } else if (command.startsWith("decimal ")) {
-    try {
-      let binary = command.substring(8).replace(/[^01]/g, ''); // Remove non-binary chars
-      let decimal = parseInt(binary, 2);
-      if (isNaN(decimal)) {
-        return "Invalid binary input.";
-      }
-      return "Decimal: " + decimal;
-    } catch (error) {
-      return "Invalid input. Please enter a valid binary number.";
-    }
-
-  } else if (command === "clear") {
-    terminal.innerHTML = "";  // Clear the terminal
-    return "";
-  } else {
-    return "Unknown command. Type 'help' for available commands.";
+  } else if (opcode === "HLT") {
+      outputDiv.innerHTML += instruction + "<br>";
   }
+  
+  else {
+    outputDiv.innerHTML += "Invalid instruction format.<br>";
+  }
+
+  instructionInput.value = ""; // Clear input field
+  outputDiv.scrollTop = outputDiv.scrollHeight; // Scroll to bottom
 }
 
 
-// Initial prompt
-terminal.innerHTML += "Welcome to the Binary Computer Simulator!<br>";
-terminal.innerHTML += "Type 'help' for available commands.<br>";
+function isBinary(num) {
+  return /^[01]+$/.test(num);
+}
+
+// Binary arithmetic functions (example: ADD)
+function binaryAdd(a, b) {
+    return (parseInt(a, 2) + parseInt(b, 2)).toString(2);
+}
+
+function binarySubtract(a, b) {
+    return (parseInt(a, 2) - parseInt(b, 2)).toString(2);
+}
+function binaryMultiply(a, b) {
+    return (parseInt(a, 2) * parseInt(b, 2)).toString(2);
+}
+
+function binaryDivide(a, b) {
+    if (b === "0") {
+        return "Division by zero!";
+    }
+    return (parseInt(a, 2) / parseInt(b, 2)).toString(2);
+}
+
 
 </script>
 
