@@ -32,63 +32,196 @@ body {
 <div id="output"></div>
 
 <script>
+let inputQueue = []; // Queue for INPUT statements
+let outputDiv;
+
 function runCode() {
   const code = document.getElementById("code").value;
-  const outputDiv = document.getElementById("output");
-  outputDiv.innerHTML = ""; // Clear previous output
+  outputDiv = document.getElementById("output");
+  outputDiv.innerHTML = "";
+  inputQueue = [];
 
   const lines = code.split("\n");
-  const variables = {}; // Store variables
+  const variables = {};
+  const arrays = {}; // Store arrays
 
+  let lineNumber = 0; // Current line number
+  const lineLabels = {}; // Store line labels for GOTO
+
+  // First pass: find line labels
   for (const line of lines) {
     const trimmedLine = line.trim();
-    if (trimmedLine === "") continue; // Skip empty lines
+    if (trimmedLine === "") continue;
+
+    const parts = trimmedLine.split(" ");
+    if (parts[0].endsWith(":")) {
+        lineLabels[parts[0].slice(0, -1)] = lineNumber;
+    }
+    lineNumber++;
+  }
+
+  lineNumber = 0; // Reset line number for execution
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmedLine = line.trim();
+    if (trimmedLine === "") continue;
 
     try {
       const parts = trimmedLine.split(" ");
       const command = parts[0].toUpperCase();
 
       switch (command) {
+        case "REM": // Comment
+          break;
         case "PRINT":
-          const value = evaluate(trimmedLine.substring(command.length).trim(), variables);
+          const value = evaluate(trimmedLine.substring(command.length).trim(), variables, arrays);
           outputDiv.innerHTML += value + "<br>";
           break;
-        case "LET": // Example: LET X = 10
+        case "LET":
           const assignmentParts = trimmedLine.substring(command.length).trim().split("=");
           const varName = assignmentParts[0].trim();
-          const varValue = evaluate(assignmentParts[1].trim(), variables);
+          const varValue = evaluate(assignmentParts[1].trim(), variables, arrays);
           variables[varName] = varValue;
           break;
-        // Add more commands (e.g., INPUT, GOTO, IF, etc.) here
-        default:
-          outputDiv.innerHTML += "Unknown command: " + command + "<br>";
-      }
-    } catch (error) {
-      outputDiv.innerHTML += "Error: " + error.message + "<br>";
-      break; // Stop execution on error
-    }
-  }
-}
+        case "INPUT":
+          const prompt = trimmedLine.substring(command.length).trim();
+          const inputValue = prompt ? window.prompt(prompt) : window.prompt("Enter value:");
+          if (inputValue === null) { // Handle cancel
+              throw new Error("Input cancelled.");
+          }
+          inputQueue.push(inputValue);
+          break;
+        case "GOTO":
+            const label = parts[1];
+            if (lineLabels.hasOwnProperty(label)) {
+                i = lineLabels[label] - 1; // -1 because the loop increments i
+            } else {
+                throw new Error("Label not found: " + label);
+            }
+            break;
+        case "IF":
+            const condition = trimmedLine.substring(command.length).trim();
+            const conditionResult = evaluate(condition, variables, arrays);
+            if (conditionResult) {
+                // Continue to the next statement (no ELSE implemented yet)
+            } else {
+                // Skip to the next line or a GOTO if present.
+                if (parts.includes("GOTO")) {
+                    const gotoIndex = parts.indexOf("GOTO") + 1;
+                    const label = parts[gotoIndex];
+                    if (lineLabels.hasOwnProperty(label)) {
+                        i = lineLabels[label] - 1;
+                    } else {
+                        throw new Error("Label not found: " + label);
+                    }
+                } else {
+                    // Find the next ELSE or ENDIF at the same IF level (not implemented yet)
+                    let elseFound = false;
+                    let endifFound = false;
+                    let ifLevel = 1;
+                    for (let j = i + 1; j < lines.length; j++) {
+                        const nextLine = lines[j].trim();
+                        if (nextLine.startsWith("IF")) {
+                            ifLevel++;
+                        } else if (nextLine.startsWith("ENDIF")) {
+                            ifLevel--;
+                            if (ifLevel === 0) {
+                                endifFound = true;
+                                i = j;
+                                break;
+                            }
+                        } else if (nextLine.startsWith("ELSE") && ifLevel === 1) {
+                            elseFound = true;
+                            i = j;
+                            break;
+                        }
+                    }
+                    if (!elseFound && !endifFound) {
+                        i = lines.length; // Exit the loop if no ELSE or ENDIF is found
+                    }
+                }
+            }
+            break;
+        case "FOR":
+          const forParts = trimmedLine.substring(command.length).trim().split("=");
+          const loopVar = forParts[0].trim();
+          const rangeParts = forParts[1].split("TO");
+          let start = evaluate(rangeParts[0].trim(), variables, arrays);
+          const end = evaluate(rangeParts[1].trim(), variables, arrays);
+          variables[loopVar] = start;
 
+          let forLoopLines = [];
+          let forLoopEnd = false;
+          let k = i + 1;
 
-function evaluate(expression, variables) {
-    expression = expression.trim();
-    if (/^".*"$/.test(expression)) { // String literal
-        return expression.slice(1, -1); // Remove quotes
-    } else if (/^[0-9.]+$/.test(expression)) { // Number
-        return parseFloat(expression);
-    } else if (variables.hasOwnProperty(expression)) { // Variable
-        return variables[expression];
-    } else { // Simple expression evaluation (add more operators as needed)
-        try {
-            return eval(expression); // Use eval cautiously!  Consider a safer expression parser.
-        } catch (e) {
-            throw new Error("Invalid expression: " + expression);
-        }
-    }
-}
-
-</script>
-
-</body>
-</html>
+          while(k < lines.length) {
+            const nextLine = lines[k].trim();
+            if (nextLine.startsWith("NEXT")) {
+                forLoopEnd = true;
+                break;
+            }
+            forLoopLines.push(nextLine);
+            k++;
+          }
+            if (!forLoopEnd){
+                throw new Error("NEXT without FOR");
+            }
+          for (; variables[loopVar] <= end; variables[loopVar]++) {
+                for (const forLine of forLoopLines){
+                    const forLineParts = forLine.split(" ");
+                    const forCommand = forLineParts[0].toUpperCase();
+                    switch (forCommand) {
+                        case "REM": // Comment
+                          break;
+                        case "PRINT":
+                          const value = evaluate(forLine.substring(forCommand.length).trim(), variables, arrays);
+                          outputDiv.innerHTML += value + "<br>";
+                          break;
+                        case "LET":
+                          const assignmentParts = forLine.substring(forCommand.length).trim().split("=");
+                          const varName = assignmentParts[0].trim();
+                          const varValue = evaluate(assignmentParts[1].trim(), variables, arrays);
+                          variables[varName] = varValue;
+                          break;
+                        case "INPUT":
+                          const prompt = forLine.substring(forCommand.length).trim();
+                          const inputValue = prompt ? window.prompt(prompt) : window.prompt("Enter value:");
+                          if (inputValue === null) { // Handle cancel
+                              throw new Error("Input cancelled.");
+                          }
+                          inputQueue.push(inputValue);
+                          break;
+                        case "IF":
+                            const condition = forLine.substring(forCommand.length).trim();
+                            const conditionResult = evaluate(condition, variables, arrays);
+                            if (conditionResult) {
+                                // Continue to the next statement (no ELSE implemented yet)
+                            } else {
+                                // Skip to the next line or a GOTO if present.
+                                if (forLineParts.includes("GOTO")) {
+                                    const gotoIndex = forLineParts.indexOf("GOTO") + 1;
+                                    const label = forLineParts[gotoIndex];
+                                    if (lineLabels.hasOwnProperty(label)) {
+                                        k = lineLabels[label] - 1;
+                                    } else {
+                                        throw new Error("Label not found: " + label);
+                                    }
+                                } else {
+                                    // Find the next ELSE or ENDIF at the same IF level (not implemented yet)
+                                    let elseFound = false;
+                                    let endifFound = false;
+                                    let ifLevel = 1;
+                                    for (let j = k + 1; j < lines.length; j++) {
+                                        const nextLine = lines[j].trim();
+                                        if (nextLine.startsWith("IF")) {
+                                            ifLevel++;
+                                        } else if (nextLine.startsWith("ENDIF")) {
+                                            ifLevel--;
+                                            if (ifLevel === 0) {
+                                                endifFound = true;
+                                                k = j;
+                                                break;
+                                            }
+                                        } else if (nextLine.startsWith("ELSE") && ifLevel === 1) {
+                                            elseFound
