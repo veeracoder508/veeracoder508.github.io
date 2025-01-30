@@ -1,113 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Number Converter</title>
-    <style>
-        body {
-            background-color: #1e1e1e; /* PowerShell background color */
-            color: #f0f0f0; /* PowerShell text color */
-            font-family: 'Consolas', monospace; /* PowerShell font */
-            padding: 20px;
-        }
+<title>Binary Computer Simulator</title>
+<style>
+body {
+  font-family: monospace;
+  background-color: #000;
+  color: #0f0;
+  padding: 20px;
+}
 
-        .container {
-            background-color: #282828; /* Slightly lighter background for container */
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
+#terminal {
+  width: 800px; /* Adjust as needed */
+  height: 400px; /* Adjust as needed */
+  overflow-y: scroll;
+  border: 2px solid #0f0;
+  padding: 10px;
+}
 
-        h1 {
-            color: #a0a0a0; /* Slightly lighter heading color */
-        }
+#input-area {
+  display: flex;
+  margin-top: 10px;
+}
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
+#prompt {
+  margin-right: 5px;
+}
 
-        input[type="number"] {
-            background-color: #3c3c3c; /* Input background color */
-            color: #f0f0f0;
-            border: 1px solid #505050; /* Input border color */
-            padding: 8px;
-            margin-bottom: 10px;
-            border-radius: 3px;
-            width: calc(100% - 18px); /* Ensure input takes full width */
-        }
-
-        button {
-            background-color: #0078d7; /* PowerShell blue */
-            color: #ffffff;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 3px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #005ba1; /* Darker blue on hover */
-        }
-
-        .results {
-            margin-top: 20px;
-            background-color: #3c3c3c; /* Results background color */
-            padding: 10px;
-            border-radius: 3px;
-            white-space: pre-wrap; /* Preserve whitespace for output */
-        }
-
-        .prompt {
-          color: #6a6a6a;  /* Slightly lighter for the prompt */
-          margin-bottom: 5px;
-        }
-        .output {
-          color: #f0f0f0;
-        }
-
-    </style>
+#command-input {
+  flex-grow: 1;
+  background-color: #000;
+  color: #0f0;
+  border: none;
+  outline: none;
+}
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Number Converter</h1>
 
-        <label for="decimalInput">C:\User\Converter\convert.exe</label>
-        <input type="number" id="decimalInput" placeholder="Enter decimal number">
+<h1>Binary Computer Simulator</h1>
 
-        <button onclick="convertNumber()">Convert</button>
+<div id="terminal"></div>
 
-        <div class="results">
-            <div class="prompt">PS C:\User\Converter\ cat bin.txt> </div>
-            <div class="output" id="binaryOutput"></div>
-            <div class="prompt">PS C:\User\Converter\ cat hex.txt> </div>
-            <div class="output" id="hexOutput"></div>
-            <div class="prompt">PS C:\UserConverter\ cat oct.txt> </div>
-            <div class="output" id="octalOutput"></div>
-        </div>
-    </div>
+<div id="input-area">
+  <span id="prompt">>></span>
+  <input type="text" id="command-input" autofocus>
+</div>
 
-    <script>
-        function convertNumber() {
-            const decimalInput = document.getElementById("decimalInput");
-            const binaryOutput = document.getElementById("binaryOutput");
-            const hexOutput = document.getElementById("hexOutput");
-            const octalOutput = document.getElementById("octalOutput");
+<script>
+const terminal = document.getElementById('terminal');
+const commandInput = document.getElementById('command-input');
 
-            const decimalValue = parseInt(decimalInput.value);
+commandInput.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter') {
+    const command = commandInput.value;
+    terminal.innerHTML += ">> " + command + "<br>"; // Display the command
 
-            if (isNaN(decimalValue)) {
-                binaryOutput.textContent = "Invalid input. Please enter a number.";
-                hexOutput.textContent = "";
-                octalOutput.textContent = "";
-                return;
-            }
+    // Process the command (replace with your binary logic)
+    let output = processCommand(command);
+    terminal.innerHTML += output + "<br>";
 
-            binaryOutput.textContent = decimalValue.toString(2);
-            hexOutput.textContent = decimalValue.toString(16).toUpperCase(); // Uppercase for hex
-            octalOutput.textContent = decimalValue.toString(8);
-        }
-    </script>
+    commandInput.value = ""; // Clear the input field
+    terminal.scrollTop = terminal.scrollHeight; // Scroll to the bottom
+  }
+});
+
+
+function processCommand(command) {
+  command = command.trim().toLowerCase();
+
+  if (command === "help") {
+      return "Available commands:  'help', 'binary <value>', 'decimal <value>' ";
+  } else if (command.startsWith("binary ")) {
+    try {
+      let decimal = parseInt(command.substring(7));
+      if (isNaN(decimal)) {
+        return "Invalid decimal input.";
+      }
+      let binary = decimal.toString(2);
+      return "Binary: " + binary;
+
+    } catch (error) {
+       return "Invalid input. Please enter a valid decimal number.";
+    }
+
+  } else if (command.startsWith("decimal ")) {
+    try {
+      let binary = command.substring(8).replace(/[^01]/g, ''); // Remove non-binary chars
+      let decimal = parseInt(binary, 2);
+      if (isNaN(decimal)) {
+        return "Invalid binary input.";
+      }
+      return "Decimal: " + decimal;
+    } catch (error) {
+      return "Invalid input. Please enter a valid binary number.";
+    }
+
+  } else if (command === "clear") {
+    terminal.innerHTML = "";  // Clear the terminal
+    return "";
+  } else {
+    return "Unknown command. Type 'help' for available commands.";
+  }
+}
+
+
+// Initial prompt
+terminal.innerHTML += "Welcome to the Binary Computer Simulator!<br>";
+terminal.innerHTML += "Type 'help' for available commands.<br>";
+
+</script>
+
 </body>
 </html>
