@@ -1,3 +1,7 @@
-error_page : Ture
-index.html : Disabled
+error_page_status : Ture
+index.html_status : Disabled manually 
+
 date_of_edit : 31/01/2025
+               dd/mm/yyyy
+time_of_edit : 30:25:17
+               ss:mm:hh
