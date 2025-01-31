@@ -13,4 +13,4 @@ there can be some issues in the files
 ### method 4
 check the status of website 
 
-[status](https://veeracoder508.github.io/error.txt)
+[status](https://veeracoder508.github.io/Error.txt)
