@@ -1,2 +1,2 @@
-error : Ture
+error_page : Ture
 index.html : Disabled 
