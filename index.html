@@ -1,190 +1,113 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>PowerShell Converter</title>
-<style>
-body {
-    font-family: Consolas, monospace; /* PowerShell font */
-    background-color: #012456; /* PowerShell blue */
-    color: #f0f0f0; /* Light gray text */
-    padding: 20px;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Converter</title>
+    <style>
+        body {
+            background-color: #1e1e1e; /* PowerShell background color */
+            color: #f0f0f0; /* PowerShell text color */
+            font-family: 'Consolas', monospace; /* PowerShell font */
+            padding: 20px;
+        }
 
-#container {
-    width: 600px;
-    margin: 0 auto;
-    border: 1px solid #ccc;
-    padding: 20px;
-    background-color: #001f3f; /* Darker blue for container */
-    border-radius: 5px;
-}
+        .container {
+            background-color: #282828; /* Slightly lighter background for container */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-}
+        h1 {
+            color: #a0a0a0; /* Slightly lighter heading color */
+        }
 
-select, input[type="text"] {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    background-color: #003366; /* Slightly darker input background*/
-    color: #f0f0f0;
-    border: 1px solid #0056b3; /* Lighter border */
-    border-radius: 3px;
-}
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
 
-button {
-    background-color: #0078d7; /* PowerShell blue button */
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-}
+        input[type="number"] {
+            background-color: #3c3c3c; /* Input background color */
+            color: #f0f0f0;
+            border: 1px solid #505050; /* Input border color */
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            width: calc(100% - 18px); /* Ensure input takes full width */
+        }
 
-#output {
-    margin-top: 20px;
-    padding: 10px;
-    background-color: #000; /* Black output background */
-    color: #0f0; /* Green output text (like a console) */
-    border-radius: 5px;
-    white-space: pre-wrap; /* Preserve whitespace */
-    overflow-y: auto; /* Add scroll if needed */
-    max-height: 200px; /* Set a max height */
-}
+        button {
+            background-color: #0078d7; /* PowerShell blue */
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
 
-/* Optional: Add a little "PS>" prompt */
-#output::before {
-    content: "PS> ";
-}
+        button:hover {
+            background-color: #005ba1; /* Darker blue on hover */
+        }
 
-</style>
+        .results {
+            margin-top: 20px;
+            background-color: #3c3c3c; /* Results background color */
+            padding: 10px;
+            border-radius: 3px;
+            white-space: pre-wrap; /* Preserve whitespace for output */
+        }
+
+        .prompt {
+          color: #6a6a6a;  /* Slightly lighter for the prompt */
+          margin-bottom: 5px;
+        }
+        .output {
+          color: #f0f0f0;
+        }
+
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>Number Converter</h1>
 
-<div id="container">
-    <h1>PowerShell Converter</h1>
+        <label for="decimalInput">C:\User\Converter\convert.exe</label>
+        <input type="number" id="decimalInput" placeholder="Enter decimal number">
 
-    <label for="inputType">Input Type:</label>
-    <select id="inputType">
-        <option value="binary">Binary</option>
-        <option value="hex">Hexadecimal</option>
-        <option value="octal">Octal</option>
-        <option value="decimal">Decimal</option>
-        <option value="string">String</option>
-    </select>
+        <button onclick="convertNumber()">Convert</button>
 
-    <label for="inputValue">Input Value:</label>
-    <input type="text" id="inputValue">
+        <div class="results">
+            <div class="prompt">PS C:\User\Converter\ cat bin.txt> </div>
+            <div class="output" id="binaryOutput"></div>
+            <div class="prompt">PS C:\User\Converter\ cat hex.txt> </div>
+            <div class="output" id="hexOutput"></div>
+            <div class="prompt">PS C:\UserConverter\ cat oct.txt> </div>
+            <div class="output" id="octalOutput"></div>
+        </div>
+    </div>
 
-    <label for="outputType">Output Type:</label>
-    <select id="outputType">
-        <option value="binary">Binary</option>
-        <option value="hex">Hexadecimal</option>
-        <option value="octal">Octal</option>
-        <option value="decimal">Decimal</option>
-        <option value="string">String</option>
-    </select>
+    <script>
+        function convertNumber() {
+            const decimalInput = document.getElementById("decimalInput");
+            const binaryOutput = document.getElementById("binaryOutput");
+            const hexOutput = document.getElementById("hexOutput");
+            const octalOutput = document.getElementById("octalOutput");
 
-    <button onclick="convert()">Convert</button>
+            const decimalValue = parseInt(decimalInput.value);
 
-    <div id="output"></div>
-</div>
-
-<script>
-function convert() {
-    const inputValue = document.getElementById("inputValue").value;
-    const inputType = document.getElementById("inputType").value;
-    const outputType = document.getElementById("outputType").value;
-    const outputDiv = document.getElementById("output");
-    outputDiv.innerHTML = ""; // Clear previous output
-
-
-    let decimalValue;
-
-    // Convert to decimal first
-    switch (inputType) {
-        case "binary":
-            decimalValue = parseInt(inputValue, 2);
-            break;
-        case "hex":
-            decimalValue = parseInt(inputValue, 16);
-            break;
-        case "octal":
-            decimalValue = parseInt(inputValue, 8);
-            break;
-        case "decimal":
-            decimalValue = parseInt(inputValue);
-            break;
-        case "string":
-            decimalValue = "";
-            for (let i = 0; i < inputValue.length; i++) {
-                decimalValue += inputValue.charCodeAt(i) + " ";
+            if (isNaN(decimalValue)) {
+                binaryOutput.textContent = "Invalid input. Please enter a number.";
+                hexOutput.textContent = "";
+                octalOutput.textContent = "";
+                return;
             }
-            decimalValue = decimalValue.trim();
-            break;
-    }
 
-    let outputValue;
-
-    // Convert from decimal to desired output
-    switch (outputType) {
-        case "binary":
-            if (inputType === "string") {
-                outputValue = "";
-                const charCodes = decimalValue.split(" ");
-                for (const code of charCodes) {
-                    outputValue += parseInt(code).toString(2) + " ";
-                }
-                outputValue = outputValue.trim();
-            } else {
-                outputValue = decimalValue.toString(2);
-            }
-            break;
-        case "hex":
-            if (inputType === "string") {
-                outputValue = "";
-                const charCodes = decimalValue.split(" ");
-                for (const code of charCodes) {
-                    outputValue += parseInt(code).toString(16) + " ";
-                }
-                outputValue = outputValue.trim();
-            } else {
-                outputValue = decimalValue.toString(16);
-            }
-            break;
-        case "octal":
-            if (inputType === "string") {
-                outputValue = "";
-                const charCodes = decimalValue.split(" ");
-                for (const code of charCodes) {
-                    outputValue += parseInt(code).toString(8) + " ";
-                }
-                outputValue = outputValue.trim();
-            } else {
-                outputValue = decimalValue.toString(8);
-            }
-            break;
-        case "decimal":
-            outputValue = decimalValue;
-            break;
-        case "string":
-            outputValue = "";
-            if (inputType !== "string") {
-                const charCodes = decimalValue.toString().split("");
-                for (const code of charCodes) {
-                   outputValue += String.fromCharCode(parseInt(code));
-                }
-            } else {
-                outputValue = inputValue;
-            }
-            break;
-    }
-
-    outputDiv.innerHTML = outputValue;
-}
-</script>
-
+            binaryOutput.textContent = decimalValue.toString(2);
+            hexOutput.textContent = decimalValue.toString(16).toUpperCase(); // Uppercase for hex
+            octalOutput.textContent = decimalValue.toString(8);
+        }
+    </script>
 </body>
 </html>
