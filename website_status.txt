@@ -5,6 +5,8 @@ website_names : https://veeracoder508.github.io/index.html
 https://veeracoder508.github.io/
 https://veeracoder508.github.io/website_status.txt
 
+theme_name : PS1.txt
+
 error_page_status : False 
 index.html_status : Active 
 
