@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Converter</title>
+    <style>
+        body {
+            background-color: #1e1e1e; /* PowerShell background color */
+            color: #f0f0f0; /* PowerShell text color */
+            font-family: 'Consolas', monospace; /* PowerShell font */
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #282828; /* Slightly lighter background for container */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #a0a0a0; /* Slightly lighter heading color */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="number"] {
+            background-color: #3c3c3c; /* Input background color */
+            color: #f0f0f0;
+            border: 1px solid #505050; /* Input border color */
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 3px;
+            width: calc(100% - 18px); /* Ensure input takes full width */
+        }
+
+        button {
+            background-color: #0078d7; /* PowerShell blue */
+            color: #ffffff;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #005ba1; /* Darker blue on hover */
+        }
+
+        .results {
+            margin-top: 20px;
+            background-color: #3c3c3c; /* Results background color */
+            padding: 10px;
+            border-radius: 3px;
+            white-space: pre-wrap; /* Preserve whitespace for output */
+        }
+
+        .prompt {
+          color: #6a6a6a;  /* Slightly lighter for the prompt */
+          margin-bottom: 5px;
+        }
+        .output {
+          color: #f0f0f0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Number Converter</h1>
+
+        <label for="decimalInput">C:\User\Converter\convert.exe</label>
+        <input type="number" id="decimalInput" placeholder="Enter decimal number">
+
+        <button onclick="convertNumber()">Convert</button>
+
+        <div class="results">
+            <div class="prompt">PS C:\User\Converter\ cat bin.txt> </div>
+            <div class="output" id="binaryOutput"></div>
+            <div class="prompt">PS C:\User\Converter\ cat hex.txt> </div>
+            <div class="output" id="hexOutput"></div>
+            <div class="prompt">PS C:\UserConverter\ cat oct.txt> </div>
+            <div class="output" id="octalOutput"></div>
+        </div>
+    </div>
+
+    <script>
+        function convertNumber() {
+            const decimalInput = document.getElementById("decimalInput");
+            const binaryOutput = document.getElementById("binaryOutput");
+            const hexOutput = document.getElementById("hexOutput");
+            const octalOutput = document.getElementById("octalOutput");
+
+            const decimalValue = parseInt(decimalInput.value);
+
+            if (isNaN(decimalValue)) {
+                binaryOutput.textContent = "Invalid input. Please enter a number.";
+                hexOutput.textContent = "";
+                octalOutput.textContent = "";
+                return;
+            }
+
+            binaryOutput.textContent = decimalValue.toString(2);
+            hexOutput.textContent = decimalValue.toString(16).toUpperCase(); // Uppercase for hex
+            octalOutput.textContent = decimalValue.toString(8);
+        }
+    </script>
+</body>
+</html>
