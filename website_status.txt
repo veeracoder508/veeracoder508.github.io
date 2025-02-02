@@ -5,16 +5,16 @@ website_names : https://veeracoder508.github.io/index.html
 https://veeracoder508.github.io/
 https://veeracoder508.github.io/website_status.txt
 
-theme_name : PS
-theme_file_name : theme/PS.txt
+theme_name : Disabled manually 
+theme_file_name : Disabled manually 
 
 
-error_page_status : False 
-index.html_status : Active 
+error_page_status : True 
+index.html_status : Disabled manually 
 
-date_of_edit : 01/02/2025
+date_of_edit : 02/02/2025
                dd/mm/yyyy
-time_of_edit : 15:00
+time_of_edit : 13:48
                hh:mm - military time
 
 <status edited times : 6>
