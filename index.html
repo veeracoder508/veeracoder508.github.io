@@ -1,147 +1,154 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Scientific Calculator</title>
-<style>
-body {
-  font-family: sans-serif;
-}
-.calculator {
-  width: 300px;
-  margin: 0 auto;
-  border: 1px solid #ccc;
-  padding: 10px;
-  border-radius: 5px;
-}
-.display {
-  width: 100%;
-  padding: 10px;
-  font-size: 20px;
-  text-align: right;
-  border: 1px solid #ccc;
-  margin-bottom: 10px;
-  background-color: #eee; /* Added background color */
-}
-.buttons {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr); /* 4 columns */
-  grid-gap: 5px;
-}
-button {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  cursor: pointer;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator</title>
+    <style>
+        body {
+            background-color: #000; /* Black background */
+            color: #0f0; /* Green text */
+            font-family: monospace; /* Monospace font */
+            padding: 20px;
+        }
 
-/* Style for operator buttons */
-.operator {
-    background-color: #f0ad4e; /* Example: Orange */
-    color: white;
-}
+        #calculator {
+            border: 2px solid #0f0; /* Green border */
+            padding: 10px;
+            width: 300px;  /* Adjust width as needed */
+            background-color: #111; /* Slightly darker background for calculator */
+        }
 
-/* Style for special function buttons (sin, cos, etc.) */
-.function {
-    background-color: #5bc0de; /* Example: Light Blue */
-    color: white;
-}
+        #display {
+            background-color: #222; /* Darker background for display */
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 5px;
+            margin-bottom: 10px;
+            text-align: right; /* Align text to the right */
+            font-size: 1.2em; /* Slightly larger font for display */
+            overflow: hidden; /* Prevent overflow of long results */
+            white-space: nowrap;   /* Prevent wrapping of the result */
+        }
 
-/* Style for equals button */
-.equals {
-    background-color: #5cb85c; /* Example: Green */
-    color: white;
-}
+        button {
+            background-color: #333; /* Darker button background */
+            color: #0f0;
+            border: 1px solid #0f0;
+            padding: 8px;
+            margin: 5px;
+            width: 40px; /* Consistent button width */
+            text-align: center; /* Center button text */
+            font-family: monospace;
+            cursor: pointer; /* Indicate clickable */
+        }
 
+        button:hover {
+            background-color: #444; /* Slightly lighter on hover */
+        }
 
-</style>
+        .operator {
+            color: #ff0; /* Yellow for operators */
+        }
+
+        .function {
+          color: #0ff; /* Cyan for functions */
+        }
+
+    </style>
 </head>
 <body>
 
-<div class="calculator">
-  <input type="text" id="display" class="display" readonly>
-  <div class="buttons">
-    <button onclick="clearDisplay()">C</button>
-    <button onclick="backspace()">DEL</button>
-    <button onclick="appendOperator('%')" class="operator">%</button>
-    <button onclick="appendOperator('/')" class="operator">/</button>
+    <h1>Scientific Calculator</h1>
 
-    <button onclick="appendNumber('7')">7</button>
-    <button onclick="appendNumber('8')">8</button>
-    <button onclick="appendNumber('9')">9</button>
-    <button onclick="appendOperator('*')" class="operator">*</button>
+    <div id="calculator">
+        <div id="display">0</div>
+        <div>
+            <button>7</button>
+            <button>8</button>
+            <button>9</button>
+            <button class="operator">/</button>
+            <button class="function">sin</button>
+        </div>
+        <div>
+            <button>4</button>
+            <button>5</button>
+            <button>6</button>
+            <button class="operator">*</button>
+            <button class="function">cos</button>
+        </div>
+        <div>
+            <button>1</button>
+            <button>2</button>
+            <button>3</button>
+            <button class="operator">-</button>
+            <button class="function">tan</button>
+        </div>
+        <div>
+            <button>0</button>
+            <button>.</button>
+            <button class="operator">+</button>
+            <button class="operator">=</button>
+            <button class="function">sqrt</button>
+        </div>
+        <div>
+          <button class="function">C</button>  <button class="function">( )</button>
+          <button class="function">^</button>
+          <button class="function">log</button>
+          <button class="function">π</button>
+        </div>
+    </div>
 
-    <button onclick="appendNumber('4')">4</button>
-    <button onclick="appendNumber('5')">5</button>
-    <button onclick="appendNumber('6')">6</button>
-    <button onclick="appendOperator('-')" class="operator">-</button>
+    <script>
+        const display = document.getElementById('display');
+        const buttons = document.querySelectorAll('button');
 
-    <button onclick="appendNumber('1')">1</button>
-    <button onclick="appendNumber('2')">2</button>
-    <button onclick="appendNumber('3')">3</button>
-    <button onclick="appendOperator('+')" class="operator">+</button>
+        let currentInput = '';
+        let result = 0;
 
-    <button onclick="appendNumber('0')">0</button>
-    <button onclick="appendNumber('.')">.</button>
-    <button onclick="calculate()" class="equals">=</button>
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                const buttonText = button.textContent;
 
-    <button onclick="calculateSin()" class="function">sin</button>
-    <button onclick="calculateCos()" class="function">cos</button>
-    <button onclick="calculateTan()" class="function">tan</button>
-    <button onclick="calculateSqrt()" class="function">√</button>
+                switch (buttonText) {
+                    case '=':
+                        try {
+                            result = eval(currentInput); // Use eval cautiously!
+                            display.textContent = result;
+                            currentInput = result.toString();
+                        } catch (error) {
+                            display.textContent = 'Error';
+                            currentInput = '';
+                        }
+                        break;
+                    case 'C': // Clear
+                        display.textContent = '0';
+                        currentInput = '';
+                        result = 0;
+                        break;
+                    case 'sin': currentInput = Math.sin(eval(currentInput)); display.textContent = currentInput; break;
+                    case 'cos': currentInput = Math.cos(eval(currentInput)); display.textContent = currentInput; break;
+                    case 'tan': currentInput = Math.tan(eval(currentInput)); display.textContent = currentInput; break;
+                    case 'sqrt': currentInput = Math.sqrt(eval(currentInput)); display.textContent = currentInput; break;
+                    case 'log': currentInput = Math.log10(eval(currentInput)); display.textContent = currentInput; break;
+                    case 'π': currentInput += Math.PI; display.textContent = currentInput; break;
+                    case '( )':
+                        if (currentInput.includes('(')) {
+                            currentInput += ')';
+                        } else {
+                            currentInput += '(';
+                        }
+                        display.textContent = currentInput;
+                        break;
+                    case '^': currentInput += '**'; display.textContent = currentInput; break;
 
-
-
-  </div>
-</div>
-
-<script>
-let display = document.getElementById('display');
-
-function appendNumber(number) {
-  display.value += number;
-}
-
-function appendOperator(operator) {
-    display.value += operator;
-}
-
-function calculate() {
-  try {
-    display.value = eval(display.value); // Use eval carefully!
-  } catch (error) {
-    display.value = 'Error';
-  }
-}
-
-function clearDisplay() {
-  display.value = '';
-}
-
-function backspace() {
-    display.value = display.value.slice(0, -1); // Remove last character
-}
-
-
-// Trigonometric and other functions
-
-function calculateSin() {
-    display.value = Math.sin(eval(display.value) * Math.PI / 180); // Convert to radians
-}
-
-function calculateCos() {
-    display.value = Math.cos(eval(display.value) * Math.PI / 180);
-}
-
-function calculateTan() {
-    display.value = Math.tan(eval(display.value) * Math.PI / 180);
-}
-
-function calculateSqrt() {
-    display.value = Math.sqrt(eval(display.value));
-}
-
-</script>
+                    default:
+                        currentInput += buttonText;
+                        display.textContent = currentInput;
+                }
+            });
+        });
+    </script>
 
 </body>
 </html>
