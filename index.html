@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Scientific Calculator</title>
+<style>
+body {
+  font-family: sans-serif;
+}
+.calculator {
+  width: 300px;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+}
+.display {
+  width: 100%;
+  padding: 10px;
+  font-size: 20px;
+  text-align: right;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  background-color: #eee; /* Added background color */
+}
+.buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns */
+  grid-gap: 5px;
+}
+button {
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Style for operator buttons */
+.operator {
+    background-color: #f0ad4e; /* Example: Orange */
+    color: white;
+}
+
+/* Style for special function buttons (sin, cos, etc.) */
+.function {
+    background-color: #5bc0de; /* Example: Light Blue */
+    color: white;
+}
+
+/* Style for equals button */
+.equals {
+    background-color: #5cb85c; /* Example: Green */
+    color: white;
+}
+
+
+</style>
+</head>
+<body>
+
+<div class="calculator">
+  <input type="text" id="display" class="display" readonly>
+  <div class="buttons">
+    <button onclick="clearDisplay()">C</button>
+    <button onclick="backspace()">DEL</button>
+    <button onclick="appendOperator('%')" class="operator">%</button>
+    <button onclick="appendOperator('/')" class="operator">/</button>
+
+    <button onclick="appendNumber('7')">7</button>
+    <button onclick="appendNumber('8')">8</button>
+    <button onclick="appendNumber('9')">9</button>
+    <button onclick="appendOperator('*')" class="operator">*</button>
+
+    <button onclick="appendNumber('4')">4</button>
+    <button onclick="appendNumber('5')">5</button>
+    <button onclick="appendNumber('6')">6</button>
+    <button onclick="appendOperator('-')" class="operator">-</button>
+
+    <button onclick="appendNumber('1')">1</button>
+    <button onclick="appendNumber('2')">2</button>
+    <button onclick="appendNumber('3')">3</button>
+    <button onclick="appendOperator('+')" class="operator">+</button>
+
+    <button onclick="appendNumber('0')">0</button>
+    <button onclick="appendNumber('.')">.</button>
+    <button onclick="calculate()" class="equals">=</button>
+
+    <button onclick="calculateSin()" class="function">sin</button>
+    <button onclick="calculateCos()" class="function">cos</button>
+    <button onclick="calculateTan()" class="function">tan</button>
+    <button onclick="calculateSqrt()" class="function">√</button>
+
+
+
+  </div>
+</div>
+
+<script>
+let display = document.getElementById('display');
+
+function appendNumber(number) {
+  display.value += number;
+}
+
+function appendOperator(operator) {
+    display.value += operator;
+}
+
+function calculate() {
+  try {
+    display.value = eval(display.value); // Use eval carefully!
+  } catch (error) {
+    display.value = 'Error';
+  }
+}
+
+function clearDisplay() {
+  display.value = '';
+}
+
+function backspace() {
+    display.value = display.value.slice(0, -1); // Remove last character
+}
+
+
+// Trigonometric and other functions
+
+function calculateSin() {
+    display.value = Math.sin(eval(display.value) * Math.PI / 180); // Convert to radians
+}
+
+function calculateCos() {
+    display.value = Math.cos(eval(display.value) * Math.PI / 180);
+}
+
+function calculateTan() {
+    display.value = Math.tan(eval(display.value) * Math.PI / 180);
+}
+
+function calculateSqrt() {
+    display.value = Math.sqrt(eval(display.value));
+}
+
+</script>
+
+</body>
+</html>
