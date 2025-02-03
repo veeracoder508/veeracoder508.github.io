@@ -3,142 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Command Prompt Calculator</title>
+    <title>PowerShell Calculator</title>
     <style>
         body {
-            background-color: #000; /* Black background */
-            color: #0f0; /* Green text */
-            font-family: monospace; /* Monospace font for command prompt feel */
-            padding: 20px;
-            overflow: hidden; /* Hide scrollbars */
-        }
-
-        #calculator {
-            width: 400px;
-            border: 2px solid #0f0;
-            padding: 10px;
-        }
-
-        #display {
-            background-color: #000;
-            color: #0f0;
-            border: none;
-            width: calc(100% - 10px); /* Occupy full width */
-            padding: 5px;
-            margin-bottom: 10px;
-            font-size: 16px;
-            outline: none; /* Remove default outline on focus */
-        }
-
-        .row {
+            background-color: #012456; /* PowerShell Blue */
+            color: #f0f0f0; /* Light Gray Text */
+            font-family: Consolas, monospace; /* Monospace Font */
             display: flex;
-            justify-content: space-between; /* Distribute buttons evenly */
-            margin-bottom: 5px;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .calculator {
+            background-color: #001845; /* Darker PowerShell Blue */
+            border: 2px solid #003262; /* Slightly Lighter Border */
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 300px;
+        }
+
+        .display {
+            background-color: #003262; /* Display Background */
+            color: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 18px;
+            width: calc(100% - 22px); /* Account for padding */
+            margin-bottom: 10px;
+            text-align: right;
+            overflow: hidden; /* Prevent text overflow */
+        }
+        .display:focus{
+            outline: none; /* Remove default focus outline */
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
         }
 
         button {
-            background-color: #222; /* Darker background for buttons */
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 8px 12px;
-            font-family: monospace;
+            background-color: #003262; /* Button Background */
+            color: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            padding: 12px;
+            font-size: 16px;
             cursor: pointer;
-            width: 22%; /* Adjust width for spacing */
-            box-sizing: border-box; /* Include padding and border in width */
+            transition: background-color 0.2s; /* Smooth Hover Effect */
         }
 
         button:hover {
-            background-color: #333; /* Slightly lighter background on hover */
+            background-color: #004e89; /* Slightly Lighter Hover */
         }
 
-        #history {
-            margin-top: 10px;
-            color: #0f0;
-            overflow-y: auto; /* Add scrollbar if history overflows */
-            max-height: 200px; /* Set a maximum height for the history */
-            background-color: rgba(0, 0, 0, 0.5); /* Slightly transparent black background */
-            padding: 5px;
-            border: 1px solid #0f0;
+        .operator {
+            background-color: #3c78d8; /* Distinct Operator Color */
         }
-
-        .history-item {
-            margin-bottom: 5px;
+        .clear{
+            background-color: #c0392b; /* Distinct Clear/Delete Color */
         }
-
+        .equal {
+            background-color: #27ae60; /* Distinct Equal Color */
+        }
     </style>
 </head>
 <body>
 
-    <div id="calculator">
-        <input type="text" id="display" readonly>
-        <div class="row">
-            <button onclick="appendToDisplay('7')">7</button>
-            <button onclick="appendToDisplay('8')">8</button>
-            <button onclick="appendToDisplay('9')">9</button>
-            <button onclick="appendToDisplay('/')">/</button>
-        </div>
-        <div class="row">
-            <button onclick="appendToDisplay('4')">4</button>
-            <button onclick="appendToDisplay('5')">5</button>
-            <button onclick="appendToDisplay('6')">6</button>
-            <button onclick="appendToDisplay('*')">*</button>
-        </div>
-        <div class="row">
-            <button onclick="appendToDisplay('1')">1</button>
-            <button onclick="appendToDisplay('2')">2</button>
-            <button onclick="appendToDisplay('3')">3</button>
-            <button onclick="appendToDisplay('-')">-</button>
-        </div>
-        <div class="row">
-            <button onclick="appendToDisplay('0')">0</button>
-            <button onclick="appendToDisplay('.')">.</button>
-            <button onclick="calculate()">=</button>
-            <button onclick="appendToDisplay('+')">+</button>
-        </div>
-        <div class="row">
-            <button onclick="clearDisplay()">C</button>
-            <button onclick="backspace()">DEL</button>
-        </div>
-        <div id="history">
-        </div>
+    <div class="calculator">
+        <input type="text" id="display" class="display" readonly>
+        <div class="buttons">
+            <button onclick="clearDisplay()" class="clear">C</button>
+            <button onclick="backspace()" class="clear">DEL</button>
+            <button onclick="appendOperator('/')" class="operator">/</button>
+            <button onclick="appendOperator('*')" class="operator">*</button>
 
+            <button onclick="appendNumber('7')">7</button>
+            <button onclick="appendNumber('8')">8</button>
+            <button onclick="appendNumber('9')">9</button>
+            <button onclick="appendOperator('-')" class="operator">-</button>
+
+            <button onclick="appendNumber('4')">4</button>
+            <button onclick="appendNumber('5')">5</button>
+            <button onclick="appendNumber('6')">6</button>
+            <button onclick="appendOperator('+')" class="operator">+</button>
+
+            <button onclick="appendNumber('1')">1</button>
+            <button onclick="appendNumber('2')">2</button>
+            <button onclick="appendNumber('3')">3</button>
+            <button onclick="calculate()" class="equal">=</button>
+
+            <button onclick="appendNumber('0')">0</button>
+            <button onclick="appendNumber('.')">.</button>
+            <button onclick="appendOperator('%')" class="operator">%</button>
+
+        </div>
     </div>
 
     <script>
         let display = document.getElementById('display');
-        let history = document.getElementById('history');
 
-        function appendToDisplay(value) {
-            display.value += value;
+        function appendNumber(number) {
+            display.value += number;
+        }
+
+        function appendOperator(operator) {
+            display.value += operator;
+        }
+
+        function calculate() {
+            try {
+                display.value = eval(display.value); // Use eval cautiously!
+            } catch (error) {
+                display.value = 'Error';
+            }
         }
 
         function clearDisplay() {
             display.value = '';
         }
-
-        function backspace() {
+        function backspace(){
             display.value = display.value.slice(0, -1);
         }
-
-        function calculate() {
-            try {
-                let result = eval(display.value);
-                display.value = result;
-                addToHistory(display.value);
-
-            } catch (error) {
-                display.value = 'Error';
-                addToHistory("Error");
-            }
-        }
-
-        function addToHistory(result) {
-            let historyItem = document.createElement('div');
-            historyItem.className = 'history-item';
-            historyItem.textContent = display.value + " = " + result; // Store the equation
-            history.appendChild(historyItem);
-        }
-
     </script>
 
 </body>
