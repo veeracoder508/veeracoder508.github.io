@@ -5,8 +5,8 @@ website_names : https://veeracoder508.github.io/index.html
 https://veeracoder508.github.io/
 https://veeracoder508.github.io/website_status.txt
 
-theme_name : ai
-theme_file_name : Not in theme 
+theme_name : calculator 
+theme_file_name : calculator.txt
 
 
 error_page_status : False
@@ -16,7 +16,7 @@ updating : False
 
 date_of_edit : 04/02/2025
                dd/mm/yyyy
-time_of_edit : 16:45
+time_of_edit : 16:56
                hh:mm - military time
 
-<status edited times : 11>
+<status edited times : 12>
