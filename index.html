@@ -3,133 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PowerShell Calculator</title>
+    <title>Gemini-like AI Chat</title>
     <style>
         body {
-            background-color: #012456; /* PowerShell Blue */
-            color: #f0f0f0; /* Light Gray Text */
-            font-family: Consolas, monospace; /* Monospace Font */
+            font-family: sans-serif;
             display: flex;
-            justify-content: center;
-            align-items: center;
+            flex-direction: column;
             min-height: 100vh;
             margin: 0;
+            background-color: #f0f0f0; /* Light gray background */
         }
 
-        .calculator {
-            background-color: #001845; /* Darker PowerShell Blue */
-            border: 2px solid #003262; /* Slightly Lighter Border */
-            border-radius: 8px;
+        #chat-container {
+            flex: 1; /* Takes up available space */
             padding: 20px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 300px;
+            overflow-y: scroll; /* Scrollable chat area */
         }
 
-        .display {
-            background-color: #003262; /* Display Background */
-            color: #f0f0f0;
-            border: none;
-            border-radius: 4px;
-            padding: 10px;
-            font-size: 18px;
-            width: calc(100% - 22px); /* Account for padding */
+        .message {
             margin-bottom: 10px;
-            text-align: right;
-            overflow: hidden; /* Prevent text overflow */
-        }
-        .display:focus{
-            outline: none; /* Remove default focus outline */
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 80%; /* Prevent messages from being too wide */
         }
 
-        .buttons {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+        .user-message {
+            background-color: #e0f2f7; /* Light blue for user */
+            align-self: flex-end; /* Align to the right */
         }
 
-        button {
-            background-color: #003262; /* Button Background */
-            color: #f0f0f0;
+        .ai-message {
+            background-color: #ffffff; /* White for AI */
+            align-self: flex-start; /* Align to the left */
+        }
+
+        #input-area {
+            padding: 10px;
+            display: flex;
+            background-color: #fff;
+        }
+
+        #user-input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        #send-button {
+            padding: 8px 16px;
+            background-color: #4285f4; /* Blue send button */
+            color: white;
             border: none;
             border-radius: 4px;
-            padding: 12px;
-            font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.2s; /* Smooth Hover Effect */
-        }
-
-        button:hover {
-            background-color: #004e89; /* Slightly Lighter Hover */
-        }
-
-        .operator {
-            background-color: #3c78d8; /* Distinct Operator Color */
-        }
-        .clear{
-            background-color: #c0392b; /* Distinct Clear/Delete Color */
-        }
-        .equal {
-            background-color: #27ae60; /* Distinct Equal Color */
         }
     </style>
 </head>
 <body>
 
-    <div class="calculator">
-        <input type="text" id="display" class="display" readonly>
-        <div class="buttons">
-            <button onclick="clearDisplay()" class="clear">C</button>
-            <button onclick="backspace()" class="clear">DEL</button>
-            <button onclick="appendOperator('/')" class="operator">/</button>
-            <button onclick="appendOperator('*')" class="operator">*</button>
-
-            <button onclick="appendNumber('7')">7</button>
-            <button onclick="appendNumber('8')">8</button>
-            <button onclick="appendNumber('9')">9</button>
-            <button onclick="appendOperator('-')" class="operator">-</button>
-
-            <button onclick="appendNumber('4')">4</button>
-            <button onclick="appendNumber('5')">5</button>
-            <button onclick="appendNumber('6')">6</button>
-            <button onclick="appendOperator('+')" class="operator">+</button>
-
-            <button onclick="appendNumber('1')">1</button>
-            <button onclick="appendNumber('2')">2</button>
-            <button onclick="appendNumber('3')">3</button>
-            <button onclick="calculate()" class="equal">=</button>
-
-            <button onclick="appendNumber('0')">0</button>
-            <button onclick="appendNumber('.')">.</button>
-            <button onclick="appendOperator('%')" class="operator">%</button>
-
+    <div id="chat-container">
         </div>
+
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Type your message...">
+        <button id="send-button" onclick="sendMessage()">Send</button>
     </div>
 
     <script>
-        let display = document.getElementById('display');
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
 
-        function appendNumber(number) {
-            display.value += number;
+        function sendMessage() {
+            const message = userInput.value.trim(); // Get user input and remove whitespace
+            if (message === "") return; // Don't send empty messages
+
+            appendMessage(message, 'user'); // Append user message
+
+            // Here you would normally send the message to your AI backend
+            // and receive a response.  This is a placeholder for that.
+            setTimeout(() => { // Simulate a delay for the AI response
+                const aiResponse = generateAIResponse(message); // Replace with your actual AI logic
+                appendMessage(aiResponse, 'ai');
+            }, 500); // 0.5 second delay
+
+
+            userInput.value = ''; // Clear the input field
         }
 
-        function appendOperator(operator) {
-            display.value += operator;
+        function appendMessage(message, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            messageDiv.textContent = message;
+            chatContainer.appendChild(messageDiv);
+
+            // Scroll to the bottom to show the latest message
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function calculate() {
-            try {
-                display.value = eval(display.value); // Use eval cautiously!
-            } catch (error) {
-                display.value = 'Error';
-            }
+        // Placeholder for AI response generation.  Replace this with your real AI interaction.
+        function generateAIResponse(userMessage) {
+            // Replace this with your actual AI logic or API call.
+            // This is just a very basic example.
+            const responses = [
+                "I understand. Please elaborate.",
+                "That's an interesting point.  Tell me more.",
+                "I'm still learning, but I'll try my best to answer.",
+                "Let's explore that further.",
+                "What are your thoughts on that?"
+            ];
+
+            const randomIndex = Math.floor(Math.random() * responses.length);
+            return responses[randomIndex];
         }
 
-        function clearDisplay() {
-            display.value = '';
-        }
-        function backspace(){
-            display.value = display.value.slice(0, -1);
-        }
+
+        // Allow sending message with Enter key
+        userInput.addEventListener("keyup", function(event) {
+          if (event.keyCode === 13) { // 13 is the Enter key code
+            sendMessage();
+          }
+        });
+
     </script>
 
 </body>
