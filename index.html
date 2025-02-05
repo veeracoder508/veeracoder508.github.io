@@ -1,154 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scientific Calculator</title>
-    <style>
-        body {
-            background-color: #000; /* Black background */
-            color: #0f0; /* Green text */
-            font-family: monospace; /* Monospace font */
-            padding: 20px;
-        }
-
-        #calculator {
-            border: 2px solid #0f0; /* Green border */
-            padding: 10px;
-            width: 300px;  /* Adjust width as needed */
-            background-color: #111; /* Slightly darker background for calculator */
-        }
-
-        #display {
-            background-color: #222; /* Darker background for display */
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 5px;
-            margin-bottom: 10px;
-            text-align: right; /* Align text to the right */
-            font-size: 1.2em; /* Slightly larger font for display */
-            overflow: hidden; /* Prevent overflow of long results */
-            white-space: nowrap;   /* Prevent wrapping of the result */
-        }
-
-        button {
-            background-color: #333; /* Darker button background */
-            color: #0f0;
-            border: 1px solid #0f0;
-            padding: 8px;
-            margin: 5px;
-            width: 40px; /* Consistent button width */
-            text-align: center; /* Center button text */
-            font-family: monospace;
-            cursor: pointer; /* Indicate clickable */
-        }
-
-        button:hover {
-            background-color: #444; /* Slightly lighter on hover */
-        }
-
-        .operator {
-            color: #ff0; /* Yellow for operators */
-        }
-
-        .function {
-          color: #0ff; /* Cyan for functions */
-        }
-
-    </style>
+<title>DeepSeek AI Chat</title>
+<style>
+  #chat-container {
+    width: 500px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+  #chat-log {
+    height: 300px;
+    overflow-y: scroll;
+    padding: 5px;
+  }
+  #user-input {
+    width: 100%;
+    padding: 5px;
+    margin-top: 10px;
+  }
+</style>
 </head>
 <body>
 
-    <h1>Scientific Calculator</h1>
+<div id="chat-container">
+  <h1>DeepSeek AI Chat</h1>
+  <div id="chat-log"></div>
+  <input type="text" id="user-input" placeholder="Type your message...">
+  <button onclick="sendMessage()">Send</button>
+</div>
 
-    <div id="calculator">
-        <div id="display">0</div>
-        <div>
-            <button>7</button>
-            <button>8</button>
-            <button>9</button>
-            <button class="operator">/</button>
-            <button class="function">sin</button>
-        </div>
-        <div>
-            <button>4</button>
-            <button>5</button>
-            <button>6</button>
-            <button class="operator">*</button>
-            <button class="function">cos</button>
-        </div>
-        <div>
-            <button>1</button>
-            <button>2</button>
-            <button>3</button>
-            <button class="operator">-</button>
-            <button class="function">tan</button>
-        </div>
-        <div>
-            <button>0</button>
-            <button>.</button>
-            <button class="operator">+</button>
-            <button class="operator">=</button>
-            <button class="function">sqrt</button>
-        </div>
-        <div>
-          <button class="function">C</button>  <button class="function">( )</button>
-          <button class="function">^</button>
-          <button class="function">log</button>
-          <button class="function">π</button>
-        </div>
-    </div>
+<script>
+  const apiKey = 'sk-356d7a828a004969b25687e33be75358'; // Replace with your actual API key
+  const chatLog = document.getElementById('chat-log');
+  const userInput = document.getElementById('user-input');
 
-    <script>
-        const display = document.getElementById('display');
-        const buttons = document.querySelectorAll('button');
+  function sendMessage() {
+    const message = userInput.value;
+    if (message.trim() === "") return; // Don't send empty messages
 
-        let currentInput = '';
-        let result = 0;
+    displayMessage(message, true); // Display user message
 
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                const buttonText = button.textContent;
+    // Send message to DeepSeek API
+    fetch('https://api.deepseek.com/v1/chat/completions', { // Replace with the correct DeepSeek API endpoint
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "deepseek-chat", // Or the specific model name you want to use
+        messages: [{ role: "user", content: message }]
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.choices && data.choices.length > 0) {
+        const reply = data.choices[0].message.content;
+        displayMessage(reply, false); // Display AI reply
+      } else {
+        displayMessage("Error: Could not get a response from the AI.", false);
+        console.error("DeepSeek API Error:", data); // Log the error for debugging
+      }
+    })
+    .catch(error => {
+      displayMessage("Error: Could not connect to the AI.", false);
+      console.error("Fetch Error:", error);
+    });
 
-                switch (buttonText) {
-                    case '=':
-                        try {
-                            result = eval(currentInput); // Use eval cautiously!
-                            display.textContent = result;
-                            currentInput = result.toString();
-                        } catch (error) {
-                            display.textContent = 'Error';
-                            currentInput = '';
-                        }
-                        break;
-                    case 'C': // Clear
-                        display.textContent = '0';
-                        currentInput = '';
-                        result = 0;
-                        break;
-                    case 'sin': currentInput = Math.sin(eval(currentInput)); display.textContent = currentInput; break;
-                    case 'cos': currentInput = Math.cos(eval(currentInput)); display.textContent = currentInput; break;
-                    case 'tan': currentInput = Math.tan(eval(currentInput)); display.textContent = currentInput; break;
-                    case 'sqrt': currentInput = Math.sqrt(eval(currentInput)); display.textContent = currentInput; break;
-                    case 'log': currentInput = Math.log10(eval(currentInput)); display.textContent = currentInput; break;
-                    case 'π': currentInput += Math.PI; display.textContent = currentInput; break;
-                    case '( )':
-                        if (currentInput.includes('(')) {
-                            currentInput += ')';
-                        } else {
-                            currentInput += '(';
-                        }
-                        display.textContent = currentInput;
-                        break;
-                    case '^': currentInput += '**'; display.textContent = currentInput; break;
 
-                    default:
-                        currentInput += buttonText;
-                        display.textContent = currentInput;
-                }
-            });
-        });
-    </script>
+    userInput.value = ''; // Clear input field
+  }
+
+  function displayMessage(message, isUser) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = isUser ? 'user-message' : 'ai-message';
+    messageDiv.textContent = message;
+    chatLog.appendChild(messageDiv);
+    chatLog.scrollTop = chatLog.scrollHeight; // Scroll to bottom
+  }
+
+  userInput.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) { // Enter key pressed
+      sendMessage();
+    }
+  });
+
+</script>
 
 </body>
 </html>
