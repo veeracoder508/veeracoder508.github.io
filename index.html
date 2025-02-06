@@ -1,91 +1,189 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>DeepSeek AI Chat</title>
+<title>PowerShell Converter</title>
 <style>
-  #chat-container {
-    width: 500px;
+body {
+    font-family: Consolas, monospace; /* PowerShell font */
+    background-color: #012456; /* PowerShell blue */
+    color: #f0f0f0; /* Light gray text */
+    padding: 20px;
+}
+
+#container {
+    width: 600px;
     margin: 0 auto;
     border: 1px solid #ccc;
-    padding: 10px;
-  }
-  #chat-log {
-    height: 300px;
-    overflow-y: scroll;
-    padding: 5px;
-  }
-  #user-input {
+    padding: 20px;
+    background-color: #001f3f; /* Darker blue for container */
+    border-radius: 5px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+select, input[type="text"] {
     width: 100%;
-    padding: 5px;
-    margin-top: 10px;
-  }
+    padding: 8px;
+    margin-bottom: 10px;
+    background-color: #003366; /* Slightly darker input background*/
+    color: #f0f0f0;
+    border: 1px solid #0056b3; /* Lighter border */
+    border-radius: 3px;
+}
+
+button {
+    background-color: #0078d7; /* PowerShell blue button */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#output {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #000; /* Black output background */
+    color: #0f0; /* Green output text (like a console) */
+    border-radius: 5px;
+    white-space: pre-wrap; /* Preserve whitespace */
+    overflow-y: auto; /* Add scroll if needed */
+    max-height: 200px; /* Set a max height */
+}
+
+/* Optional: Add a little "PS>" prompt */
+#output::before {
+    content: "PS> ";
+}
+
 </style>
 </head>
 <body>
 
-<div id="chat-container">
-  <h1>DeepSeek AI Chat</h1>
-  <div id="chat-log"></div>
-  <input type="text" id="user-input" placeholder="Type your message...">
-  <button onclick="sendMessage()">Send</button>
+<div id="container">
+    <h1>PowerShell Converter</h1>
+
+    <label for="inputType">Input Type:</label>
+    <select id="inputType">
+        <option value="binary">Binary</option>
+        <option value="hex">Hexadecimal</option>
+        <option value="octal">Octal</option>
+        <option value="decimal">Decimal</option>
+        <option value="string">String</option>
+    </select>
+
+    <label for="inputValue">Input Value:</label>
+    <input type="text" id="inputValue">
+
+    <label for="outputType">Output Type:</label>
+    <select id="outputType">
+        <option value="binary">Binary</option>
+        <option value="hex">Hexadecimal</option>
+        <option value="octal">Octal</option>
+        <option value="decimal">Decimal</option>
+        <option value="string">String</option>
+    </select>
+
+    <button onclick="convert()">Convert</button>
+
+    <div id="output"></div>
 </div>
 
 <script>
-  const apiKey = 'sk-356d7a828a004969b25687e33be75358'; // Replace with your actual API key
-  const chatLog = document.getElementById('chat-log');
-  const userInput = document.getElementById('user-input');
-
-  function sendMessage() {
-    const message = userInput.value;
-    if (message.trim() === "") return; // Don't send empty messages
-
-    displayMessage(message, true); // Display user message
-
-    // Send message to DeepSeek API
-    fetch('https://platform.deepseek.com/api_keys', { // Replace with the correct DeepSeek API endpoint
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`
-      },
-      body: JSON.stringify({
-        model: "deepseek-chat", // Or the specific model name you want to use
-        messages: [{ role: "user", content: message }]
-      })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.choices && data.choices.length > 0) {
-        const reply = data.choices[0].message.content;
-        displayMessage(reply, false); // Display AI reply
-      } else {
-        displayMessage("Error: Could not get a response from the AI.", false);
-        console.error("DeepSeek API Error:", data); // Log the error for debugging
-      }
-    })
-    .catch(error => {
-      displayMessage("Error: Could not connect to the AI.", false);
-      console.error("Fetch Error:", error);
-    });
+function convert() {
+    const inputValue = document.getElementById("inputValue").value;
+    const inputType = document.getElementById("inputType").value;
+    const outputType = document.getElementById("outputType").value;
+    const outputDiv = document.getElementById("output");
+    outputDiv.innerHTML = ""; // Clear previous output
 
 
-    userInput.value = ''; // Clear input field
-  }
+    let decimalValue;
 
-  function displayMessage(message, isUser) {
-    const messageDiv = document.createElement('div');
-    messageDiv.className = isUser ? 'user-message' : 'ai-message';
-    messageDiv.textContent = message;
-    chatLog.appendChild(messageDiv);
-    chatLog.scrollTop = chatLog.scrollHeight; // Scroll to bottom
-  }
-
-  userInput.addEventListener("keyup", function(event) {
-    if (event.keyCode === 13) { // Enter key pressed
-      sendMessage();
+    // Convert to decimal first
+    switch (inputType) {
+        case "binary":
+            decimalValue = parseInt(inputValue, 2);
+            break;
+        case "hex":
+            decimalValue = parseInt(inputValue, 16);
+            break;
+        case "octal":
+            decimalValue = parseInt(inputValue, 8);
+            break;
+        case "decimal":
+            decimalValue = parseInt(inputValue);
+            break;
+        case "string":
+            decimalValue = "";
+            for (let i = 0; i < inputValue.length; i++) {
+                decimalValue += inputValue.charCodeAt(i) + " ";
+            }
+            decimalValue = decimalValue.trim();
+            break;
     }
-  });
 
+    let outputValue;
+
+    // Convert from decimal to desired output
+    switch (outputType) {
+        case "binary":
+            if (inputType === "string") {
+                outputValue = "";
+                const charCodes = decimalValue.split(" ");
+                for (const code of charCodes) {
+                    outputValue += parseInt(code).toString(2) + " ";
+                }
+                outputValue = outputValue.trim();
+            } else {
+                outputValue = decimalValue.toString(2);
+            }
+            break;
+        case "hex":
+            if (inputType === "string") {
+                outputValue = "";
+                const charCodes = decimalValue.split(" ");
+                for (const code of charCodes) {
+                    outputValue += parseInt(code).toString(16) + " ";
+                }
+                outputValue = outputValue.trim();
+            } else {
+                outputValue = decimalValue.toString(16);
+            }
+            break;
+        case "octal":
+            if (inputType === "string") {
+                outputValue = "";
+                const charCodes = decimalValue.split(" ");
+                for (const code of charCodes) {
+                    outputValue += parseInt(code).toString(8) + " ";
+                }
+                outputValue = outputValue.trim();
+            } else {
+                outputValue = decimalValue.toString(8);
+            }
+            break;
+        case "decimal":
+            outputValue = decimalValue;
+            break;
+        case "string":
+            outputValue = "";
+            if (inputType !== "string") {
+                const charCodes = decimalValue.toString().split("");
+                for (const code of charCodes) {
+                   outputValue += String.fromCharCode(parseInt(code));
+                }
+            } else {
+                outputValue = inputValue;
+            }
+            break;
+    }
+
+    outputDiv.innerHTML = outputValue;
+}
 </script>
 
 </body>
