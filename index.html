@@ -1,110 +1,111 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>CMD Simulator</title>
+<title>Command Simulator</title>
 <style>
 body {
-    font-family: monospace; /* Use a monospace font for command-line look */
-    background-color: #000; /* Black background */
-    color: #0f0; /* Green text */
-    padding: 10px;
-    margin: 0;
-    overflow: hidden; /* Prevent scrollbars */
+  font-family: monospace; /* Use a monospace font for command output */
 }
-
 #terminal {
-    width: 95%; /* Adjust width as needed */
-    height: 90vh; /* Adjust height as needed */
-    overflow-y: scroll; /* Allow scrolling within the terminal */
-    border: 1px solid #ccc;
-    padding: 5px;
-    white-space: pre-wrap; /* Preserve whitespace and wrap text */
+  width: 600px;
+  height: 300px;
+  border: 1px solid #ccc;
+  overflow-y: scroll;
+  background-color: #000; /* Black background */
+  color: #fff; /* White text */
+  padding: 10px;
 }
-
 #input-area {
-    display: flex; /* Align prompt and input */
-    margin-top: 10px;
-}
-
-#prompt {
-    margin-right: 5px;
-}
-
-#user-input {
-    flex-grow: 1; /* Input takes up available space */
-    background-color: #000;
-    color: #0f0;
-    border: none;
-    outline: none; /* Remove default outline */
+  width: 100%;
+  padding: 5px;
+  margin-top: 10px;
+  box-sizing: border-box;
+  background-color: #000;
+  color: #fff;
+  border: 1px solid #ccc;
 }
 </style>
 </head>
 <body>
 
+<h1>Command Simulator</h1>
+
 <div id="terminal"></div>
-<div id="input-area">
-    <span id="prompt">C:\></span>
-    <input type="text" id="user-input" autofocus onkeydown="handleInput(event)">
-</div>
+<input type="text" id="input-area" placeholder="Enter command...">
 
 <script>
-    const terminal = document.getElementById("terminal");
-    const userInput = document.getElementById("user-input");
-    const prompt = document.getElementById("prompt");
+  const terminal = document.getElementById("terminal");
+  const inputArea = document.getElementById("input-area");
 
-    function handleInput(event) {
-        if (event.key === "Enter") {
-            const command = userInput.value;
-            terminal.innerHTML += `<span style="color:yellow;">C:\>${command}</span><br>`; // Display command with yellow color
-            processCommand(command);
-            userInput.value = ""; // Clear input
-            terminal.scrollTop = terminal.scrollHeight; // Scroll to bottom
-        }
+  inputArea.addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+      executeCommand();
+    }
+  });
+
+  function executeCommand() {
+    const command = inputArea.value;
+    terminal.innerHTML += `$ ${command}<br>`; // Display user command
+
+    const parts = command.split(/\s+/); // Split by any whitespace
+    const cmd = parts[0].toLowerCase();
+    const args = parts.slice(1);
+
+    if (cmd === "ping") {
+      handlePing(args);
+    } else if (cmd === "openweb") {
+      handleOpenWeb(args);
+    } else if (cmd === "cls" || cmd === "clear") {
+      terminal.innerHTML = ""; // Clear terminal
+    } else if (cmd === "help") {
+        terminal.innerHTML += "Available commands: ping, openweb, cls/clear, help<br>";
+    } else {
+      terminal.innerHTML += `Command '${cmd}' not recognized.<br>`;
     }
 
-    function processCommand(command) {
-      const parts = command.split(/\s+/); // Split by any whitespace
-      const cmd = parts[0].toLowerCase();
-      const args = parts.slice(1);
-
-      if (cmd === "ping") {
-        if (args.length === 1) {
-          const host = args[0];
-          terminal.innerHTML += `Pinging ${host}...<br>`;
-
-          // Simulate ping (replace with actual ping functionality)
-          setTimeout(() => {
-            const success = Math.random() < 0.8; // 80% success rate (example)
-            if (success) {
-              terminal.innerHTML += `Reply from ${host}: bytes=32 time<1ms TTL=64<br>`;
-            } else {
-              terminal.innerHTML += `Request timed out.<br>`;
-            }
-            terminal.scrollTop = terminal.scrollHeight;
-          }, 1000); // Simulate delay
-        } else {
-          terminal.innerHTML += "Usage: ping hostname<br>";
-        }
-      } else if (cmd === "cls" || cmd === "clear") {
-        terminal.innerHTML = ""; // Clear terminal
-      } else if (cmd === "help") {
-        terminal.innerHTML += "Available commands: ping, cls/clear, help<br>";
-      } else if (cmd === "echo") {
-        terminal.innerHTML += args.join(" ") + "<br>";
-      } else if (cmd === "cd") {
-        terminal.innerHTML += "cd command is not yet implemented.<br>"; // Placeholder
-      } else if (cmd === "dir" || cmd === "ls") {
-        terminal.innerHTML += "dir/ls command is not yet implemented.<br>"; // Placeholder
-      } else if (cmd === "exit") {
-          window.close(); // Close the window (if allowed)
-      }
-      else if (cmd) {
-        terminal.innerHTML += `'${cmd}' is not recognized.<br>`;
-      }
-    terminal.scrollTop = terminal.scrollHeight;
+    inputArea.value = ""; // Clear input
+    terminal.scrollTop = terminal.scrollHeight; // Scroll to bottom
   }
 
-    userInput.focus(); // Set focus to input on load
+  function handlePing(args) {
+    if (args.length === 1) {
+      const target = args[0];
+      terminal.innerHTML += `Pinging ${target}...<br>`;
+
+      // Simulate ping (replace with actual ping if needed)
+      setTimeout(() => {
+        const success = Math.random() < 0.8; // 80% chance of "success"
+        if (success) {
+          terminal.innerHTML += `Reply from ${target}: Bytes=32 time<1ms TTL=64<br>`;
+        } else {
+          terminal.innerHTML += `Request timed out.<br>`;
+        }
+        terminal.scrollTop = terminal.scrollHeight;
+      }, 500); // Simulate delay
+    } else {
+      terminal.innerHTML += "Usage: ping hostname/IP<br>";
+    }
+  }
+
+  function handleOpenWeb(args) {
+    if (args.length === 1) {
+      const url = args[0];
+      let fullUrl = url;
+      if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        fullUrl = "http://" + url; // Add http:// if not present
+      }
+      terminal.innerHTML += `Opening ${fullUrl}...<br>`;
+
+      try {
+        window.open(fullUrl, "_blank"); // Open in new tab/window
+        terminal.innerHTML += `Opened ${fullUrl} in a new tab.<br>`;
+      } catch (error) {
+        terminal.innerHTML += `Could not open ${fullUrl}.<br>`;
+      }
+    } else {
+      terminal.innerHTML += "Usage: openweb URL<br>";
+    }
+  }
 </script>
 
 </body>
