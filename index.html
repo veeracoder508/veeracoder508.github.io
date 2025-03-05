@@ -9,41 +9,58 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
   margin: 0;
+  background-color: #f4f4f4;
 }
 
-.video-button {
-  padding: 10px 20px;
-  margin: 10px;
-  background-color: #4CAF50; /* Green */
-  border: none;
-  color: white;
+.video-container {
+  margin: 20px;
   text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 5px;
 }
 
-.video-button:hover {
-  background-color: #3e8e41;
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
 
 </style>
 </head>
 <body>
 
-<h1>Video Links</h1>
+<div class="video-container">
+  <button onclick="openVideo1()">Open Video 1</button>
+</div>
 
-<button class="video-button" onclick="openVideo('https://drive.google.com/file/d/155oWsWE_-vIkLroLeAfJPZdfbZ2r4gSd/view?usp=drivesdk')">Video 1</button>
-<button class="video-button" onclick="openVideo('https://drive.google.com/file/d/15FfVR_tDcMG9jcnCHEgqJk5dnZL_N-cS/view?usp=drivesdk')">Video 2</button>
-<button class="video-button" onclick="openVideo('https://drive.google.com/file/d/150zVo8Hef0jd0znz5k_gvjI9jo6P4Uao/view?usp=drivesdk')">Video 3</button>
+<div class="video-container">
+  <button onclick="openVideo2()">Open Video 2</button>
+</div>
+
+<div class="video-container">
+  <button onclick="openVideo3()">Open Video 3</button>
+</div>
 
 <script>
-function openVideo(url) {
-  window.open(url, '_blank');
+function openVideo1() {
+  window.open("https://drive.google.com/file/d/155oWsWE_-vIkLroLeAfJPZdfbZ2r4gSd/view?usp=drivesdk", "_blank");
+}
+
+function openVideo2() {
+  window.open("https://drive.google.com/file/d/15FfVR_tDcMG9jcnCHEgqJk5dnZL_N-cS/view?usp=drivesdk", "_blank");
+}
+
+function openVideo3() {
+  window.open("https://drive.google.com/file/d/150zVo8Hef0jd0znz5k_gvjI9jo6P4Uao/view?usp=drivesdk", "_blank");
 }
 </script>
 
