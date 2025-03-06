@@ -11,7 +11,10 @@ body {
   justify-content: center;
   min-height: 100vh;
   margin: 0;
-  background-color: #f4f4f4;
+  background-image: url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2nN6a4J1hjDnaxyhgeFbmWIeB3_JYCtPR3u-ceQlDVQXeYe5MgDcN48PE&s=10');
+  background-size: cover; /* Cover the entire viewport */
+  background-repeat: no-repeat; /* Prevent image repetition */
+  background-position: center; /* Center the image */
 }
 
 .video-container {
@@ -22,7 +25,7 @@ body {
 button {
   padding: 10px 20px;
   font-size: 16px;
-  background-color: #007bff;
+  background-color: #6d3ad5;
   color: white;
   border: none;
   border-radius: 5px;
@@ -31,12 +34,18 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #5528b3; /* Darker shade for hover effect */
 }
 
+h1 {
+  color: #6d3ad5;
+  font-family: monospace;
+}
 </style>
 </head>
 <body>
+
+<h1>VIDEO</h1>
 
 <div class="video-container">
   <button onclick="openVideo1()">Open Video 1</button>
