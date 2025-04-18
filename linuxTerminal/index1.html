@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Web Terminal</title>
+  <style>
+    #terminal {
+      background-color: black;
+      color: green;
+      font-family: monospace;
+      padding: 10px;
+      overflow: auto; /* Enables scrolling */
+      height: 300px; /* Set a fixed height for scrolling */
+    }
+
+    #commandInput {
+      width: 95%;
+      background-color: black;
+      color: white;
+      font-family: monospace;
+      border: 1px solid gray;
+      padding: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Web Terminal</h1>
+  <div id="terminal"></div>
+  <input type="text" id="commandInput" placeholder="Enter command">
+
+  <script>
+    const terminal = document.getElementById('terminal');
+    const commandInput = document.getElementById('commandInput');
+
+    commandInput.addEventListener('keydown', async (event) => {
+      if (event.key === 'Enter') {
+        const command = commandInput.value;
+        terminal.innerHTML += `<p> > ${command}</p>`; // Echo command
+
+        try {
+          const response = await fetch('/execute', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ command: command })
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          terminal.innerHTML += `<p>${data.output}</p>`;
+        } catch (error) {
+          terminal.innerHTML += `<p style="color: red;">Error: ${error}</p>`;
+        }
+
+        commandInput.value = ''; // Clear input
+        terminal.scrollTop = terminal.scrollHeight; // Scroll to bottom
+      }
+    });
+  </script>
+</body>
+</html>
