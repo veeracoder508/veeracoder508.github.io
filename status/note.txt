@@ -1,0 +1,1 @@
+to check the live status of the website run main.py 
