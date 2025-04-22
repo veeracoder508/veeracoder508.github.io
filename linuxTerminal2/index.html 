@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Simple Terminal</title>
+<style>
+  body {
+    font-family: monospace;
+    background-color: #000;
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+  }
+  .terminal {
+    border: 1px solid #ccc;
+    padding: 10px;
+    overflow-y: auto;
+    height: 300px; /* Adjust as needed */
+  }
+  .command-line {
+    display: flex;
+  }
+  .prompt {
+    margin-right: 10px;
+    color: #0f0; /* Green prompt */
+  }
+  input[type="text"] {
+    background-color: transparent;
+    color: #fff;
+    border: none;
+    flex-grow: 1;
+    font-family: monospace;
+    outline: none;
+  }
+  .output {
+    margin-top: 5px;
+  }
+</style>
+</head>
+<body>
+
+<div class="terminal" id="terminal">
+  <div class="output">Welcome to the Simple Terminal!</div>
+  <div class="command-line">
+    <span class="prompt">user@localhost:~$</span>
+    <input type="text" id="commandInput" onkeydown="handleInput(event)">
+  </div>
+</div>
+
+<script>
+  const terminal = document.getElementById('terminal');
+  const commandInput = document.getElementById('commandInput');
+  let currentDirectory = '/home/user'; // Simulate current directory
+
+  // Simulate file system (very basic)
+  const fileSystem = {
+    '/': ['home'],
+    '/home': ['user'],
+    '/home/user': []
+  };
+
+  function handleInput(event) {
+    if (event.key === 'Enter') {
+      const commandLine = commandInput.value.trim();
+      terminal.innerHTML += `<div class="command-line"><span class="prompt">${currentDirectory}$</span> ${commandLine}</div>`;
+      processCommand(commandLine);
+      commandInput.value = '';
+    }
+  }
+
+  function processCommand(commandLine) {
+    const parts = commandLine.split(' ');
+    const command = parts[0];
+    const args = parts.slice(1);
+    let output = '';
+
+    switch (command) {
+      case 'help':
+        output = 'Available commands: help, echo [text], date, ls, cd [directory], touch [filename]';
+        break;
+      case 'date':
+        output = new Date().toLocaleString();
+        break;
+      case 'echo':
+        output = args.length > 0 ? args.join(' ') : 'Please provide text after the echo command.';
+        break;
+      case 'ls':
+        output = listDirectory();
+        break;
+      case 'cd':
+        output = changeDirectory(args[0]);
+        break;
+      case 'touch':
+        output = createFile(args[0]);
+        break;
+      default:
+        if (command !== '') {
+          output = `Command not found: ${command}`;
+        }
+        break;
+    }
+    terminal.innerHTML += `<div class="output">${output}</div>`;
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function listDirectory() {
+    if (fileSystem[currentDirectory]) {
+      return fileSystem[currentDirectory].join('<br>');
+    } else {
+      return 'Error: No such directory.';
+    }
+  }
+
+  function changeDirectory(target) {
+    if (!target) {
+      currentDirectory = '/home/user'; // Go to home if no argument
+      return '';
+    }
+
+    let newDirectory;
+    if (target.startsWith('/')) {
+      newDirectory = target;
+    } else if (target === '..') {
+      const parts = currentDirectory.split('/').filter(part => part !== '');
+      parts.pop();
+      newDirectory = '/' + parts.join('/');
+      if (newDirectory === '/') newDirectory = '/';
+      else if (newDirectory === '') newDirectory = '/home/user'; // Avoid empty path
+    } else {
+      newDirectory = `${currentDirectory}/${target}`;
+    }
+
+    // Basic validation - check if the directory exists in our simulated file system
+    if (fileSystem.hasOwnProperty(newDirectory)) {
+      currentDirectory = newDirectory;
+      return '';
+    } else {
+      return `cd: no such file or directory: ${target}`;
+    }
+  }
+
+  function createFile(filename) {
+    if (filename) {
+      if (!fileSystem[currentDirectory].includes(filename)) {
+        fileSystem[currentDirectory].push(filename);
+        return ''; // Simulate successful creation (no actual file is created)
+      } else {
+        return `touch: cannot touch '${filename}': File exists`;
+      }
+    } else {
+      return 'touch: missing file operand';
+    }
+  }
+</script>
+
+</body>
+</html>
