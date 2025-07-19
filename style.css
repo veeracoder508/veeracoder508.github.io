@@ -1,170 +1,80 @@
-/* Base styles (for mobile-first approach or general styles) */
-* {
+*{
     margin: 0;
     padding: 0;
-    box-sizing: border-box; /* Add box-sizing for better layout control */
 }
 
-.main {
+.main{
     width: 100%;
     background: linear-gradient(to top, rgba(0,0,0,0.5)50%,rgba(0,0,0,0.5)50%), url(a.jpg);
     background-position: center;
-    background-size: contain;
+    background-size: cover;
     height: 100vh;
 }
 
-.navbar {
-    width: 90%; /* Adjust width for smaller screens */
-    height: 75vh;
+.navbar{
+    width: 1200px;
+    height: 75px;
     margin: auto;
-    display: flex; /* Use flexbox for easier alignment */
-    justify-content: space-between; /* Space out items */
-    align-items: center; /* Vertically align items */
-    padding: 0 10px; /* Add some padding */
 }
 
-.icon {
-    width: 150px; /* Adjust icon width for smaller screens */
+.icon{
+    width: 200px;
+    float: left;
     height: 70px;
 }
 
-.logo {
+.logo{
     color: #ff7200;
-    font-size: 30px; /* Adjust font size for smaller screens */
+    font-size: 35px;
     font-family: Arial;
-    padding-left: 0; /* Remove padding-left here, let navbar padding handle it */
+    padding-left: 20px;
+    float: left;
     padding-top: 10px;
-    margin-top: 5px;
+    margin-top: 5px
 }
 
-.content {
-    width: 90%; /* Adjust width for smaller screens */
+.content{
+    width: 1200px;
     height: auto;
     margin: auto;
     color: #fff;
     position: relative;
-    padding: 0 10px; /* Add padding to content */
-    text-align: center; /* Center content for mobile */
 }
 
-.content .par {
-    padding-left: 0; /* Remove specific padding for mobile */
+.content .par{
+    padding-left: 20px;
     padding-bottom: 25px;
     font-family: Arial;
     letter-spacing: 1.2px;
     line-height: 30px;
 }
 
-.content h1 {
+.content h1{
     font-family: 'Times New Roman';
-    font-size: 35px; /* Adjust font size for smaller screens */
-    padding-left: 0; /* Remove specific padding for mobile */
-    margin-top: 5%; /* Adjust margin-top */
+    font-size: 50px;
+    padding-left: 20px;
+    margin-top: 9%;
     letter-spacing: 2px;
 }
 
-.content span {
+.content span{
     color: #ff5100;
-    font-size: 120%; /* Adjust font size for smaller screens */
+    font-size: 150%;
     font-family: 'Times New Roman';
 }
 
-.next {
+.next{
     text-decoration: none;
     color: #fff;
-    font-size: 20px; /* Adjust font size for smaller screens */
-    float: none; /* Remove float for better mobile layout */
-    display: block; /* Make it a block element to take full width */
-    text-align: center; /* Center the text */
-    font-family: Arial;
+    font-size: 25px;
+    float:left;
+    font-family:Arial;
     font-weight: bold;
     background-color: rgba(0, 0, 0, 0);
-    padding: 10px 0; /* Adjust padding */
-    margin-top: 20px; /* Add some margin */
+    padding-left: 150px;
 }
 
-.next:hover {
+.next:hover{
     color: #ff7200;
     transition: .3s ease;
-}
-
-/* --- Media Queries --- */
-
-/* For Tablets (e.g., 768px and up) */
-@media screen and (min-width: 768px) {
-    .navbar {
-        width: 1000px; /* Slightly smaller for tablets */
-        padding: 0;
-    }
-
-    .icon {
-        width: 200px;
-    }
-
-    .logo {
-        font-size: 35px;
-        padding-left: 20px;
-    }
-
-    .content {
-        width: 1000px; /* Slightly smaller for tablets */
-        padding: 0;
-        text-align: left; /* Align text to left for tablets */
-    }
-
-    .content .par {
-        padding-left: 20px;
-    }
-
-    .content h1 {
-        font-size: 45px;
-        padding-left: 20px;
-        margin-top: 7%;
-    }
-
-    .content span {
-        font-size: 130%;
-    }
-
-    .next {
-        float: left; /* Re-apply float for tablets */
-        padding-left: 150px;
-        font-size: 25px;
-        display: inline-block; /* Revert to inline-block */
-        text-align: left;
-    }
-}
-
-/* For Desktops (e.g., 1024px and up) */
-@media screen and (min-width: 1024px) {
-    .navbar {
-        width: 1200px;
-    }
-
-    .logo {
-        font-size: 35px;
-    }
-
-    .content {
-        width: 1200px;
-    }
-
-    .content .par {
-        padding-left: 20px;
-    }
-
-    .content h1 {
-        font-size: 50px;
-        padding-left: 20px;
-        margin-top: 9%;
-    }
-
-    .content span {
-        font-size: 150%;
-    }
-
-    .next {
-        padding-left: 150px;
-        font-size: 25px;
-    }
 }
