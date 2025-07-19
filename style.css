@@ -15,7 +15,7 @@
 
 .navbar {
     width: 90%; /* Adjust width for smaller screens */
-    height: 75px;
+    height: 75vh;
     margin: auto;
     display: flex; /* Use flexbox for easier alignment */
     justify-content: space-between; /* Space out items */
