@@ -12,6 +12,7 @@
     height: 200vh;
     float: left;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .navbar{
