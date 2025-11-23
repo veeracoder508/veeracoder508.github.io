@@ -9,6 +9,7 @@
     --border-color: #006466; /* A brighter teal for accents/borders and code text */
     --hover-color: #4D194D; /* A deep purple for hover state */
     --code-background-color: #065A60; /* Slightly different dark teal for code blocks */
+    --sub-heading-color: #006466; /* bright teal for the sub-heading */
 }
 
 /* --- NEW: Utility class for hiding elements --- */
@@ -19,7 +20,7 @@
 * {
     padding: 0;
     margin: 0;
-    box-sizing: border-box; /* IMPORTANT: Ensures padding/borders don't affect width */
+    box-sizing: border-box;
 }
 
 html {
@@ -27,23 +28,26 @@ html {
 }
 
 .scroll-container {
-    z-index: 999;
     background-color: var(--background-color);
     width: 100%;
     overflow: hidden;
     white-space: nowrap;
     box-sizing: border-box;
-    /* Updated border color */
     border-bottom: solid 2px var(--border-color);
     padding: 10px;
-    position: relative;
+    
+    /* Make the scroll container fixed to keep it at the top */
+    position: fixed; 
+    top: 0; 
+    left: 0;
+    z-index: 1000; /* Ensure it is above the nav bar */
+    
     .scrolling-text {
-        z-index: 999;
         display: inline-block;
         padding-left: 100%;
         animation: scroll-left 30s linear infinite;
         font-family: var(--top-info-font);
-        color: var(--nav-bar-font-color); /* Added color for scrolling text */
+        color: var(--nav-bar-font-color); 
     }
 }
 
@@ -57,6 +61,7 @@ html {
   }
 }
 
+/* --- Nav Bar Styling (Scroll-up-to-Show) --- */
 .nav {
     margin: 10px;
     border-radius: 50px;
@@ -71,11 +76,25 @@ html {
     /* Vertically centers the logo and links */
     align-items: center; 
     padding: 0 40px; 
-    position: relative; 
+    
+    /* --- FIXED NAV PROPERTIES --- */
+    position: fixed; 
+    top: -100px; /* Initial HIDDEN position */
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: calc(100% - 20px); 
+    max-width: 1400px; 
+    z-index: 999; /* Below the scroll-container */
+    
+    transition: top 0.3s ease-in-out; 
+}
+
+/* NEW: Class to make the navigation bar visible, appearing below the scroll-container */
+.nav.show-nav {
+    top: 50px; /* Scroll container is ~40px + 10px nav margin = 50px */
 }
 
 .nav .logo h1 {
-    z-index: 999;
     align-self: center;
     font-family: var(--nav-bar-font);
     color: var(--nav-bar-font-color); 
@@ -92,7 +111,6 @@ html {
 }
 
 .nav .items a {
-    z-index: 999;
     text-decoration: none;
     color: var(--nav-bar-font-color);
     font-family: var(--nav-bar-font);
@@ -106,34 +124,27 @@ html {
     text-decoration: underline;
 }
 
-/* --- NEW: Mobile Menu Toggle (Hamburger) --- */
+/* --- Mobile Menu Toggle (Hamburger) --- */
 .menu-toggle {
-    z-index: 999;
-    display: none; /* Hidden by default on desktop */
     cursor: pointer;
-    font-size: 2rem; /* Size of the icon is now controlled by the SVG width/height */
     color: var(--nav-bar-font-color);
     padding: 10px;
-    z-index: 1001; /* Above the sidebar */
+    /* Z-index change: Bump it up to guarantee it's on top of sidebar (z-index: 1000) */
+    z-index: 1010; 
     transition: color 0.3s ease;
-    /* NEW: Ensures SVGs are stacked and aligned */
     position: relative; 
-    width: 44px; /* Set a fixed size for the toggle area */
+    width: 44px; 
     height: 44px;
     display: flex;
     justify-content: center;
     align-items: center;
+    display: none; /* Hidden by default on desktop, will be shown in media query */
 }
 
-/* --- NEW: Styling for the SVG icons inside the toggle button --- */
 .menu-toggle .menu-icon {
-    /* The SVG fill color is set to the nav font color */
-    z-index: 999;
-    color: var(--nav-bar-font-color);
-    /* Set the SVG size using variables */
+    fill: var(--nav-bar-font-color);
     width: 32px; 
     height: 32px;
-    /* Position both icons in the same spot, using absolute to stack them */
     position: absolute; 
     top: 50%;
     left: 50%;
@@ -141,39 +152,37 @@ html {
     transition: opacity 0.3s ease;
 }
 
-/* --- NEW: Mobile Sidebar Styling --- */
+/* --- Mobile Sidebar --- */
 .mobile-sidebar {
-    z-index: 999;
     position: fixed;
     top: 0;
     right: 0;
-    width: 250px; /* Fixed width for the sidebar */
-    max-width: 80vw; /* Ensures it doesn't take up too much space on small tablets */
+    width: 250px; 
+    max-width: 80vw; 
     height: 100%;
     background-color: var(--nav-bar-color);
     z-index: 1000;
     box-shadow: -5px 0 20px rgba(0, 0, 0, 0.7);
-    transform: translateX(100%); /* Start off-screen to the right */
-    /* Smooth, modern transition for slide effect */
+    transform: translateX(100%); 
     transition: transform 0.3s cubic-bezier(0.785, 0.135, 0.15, 0.86); 
-    padding-top: 100px; /* Space for the header/toggle */
+    
+    /* Adjusted padding to clear the fixed scroll-container */
+    padding-top: 50px; 
+    
     border-left: 2px solid var(--border-color);
 }
 
 .mobile-sidebar.open {
-    z-index: 999;
-    transform: translateX(0); /* Slide into view */
+    transform: translateX(0); 
 }
 
 .mobile-sidebar .mobile-items {
-    z-index: 999;
     display: flex;
     flex-direction: column;
     padding: 20px;
 }
 
 .mobile-sidebar .mobile-items a {
-    z-index: 999;
     text-decoration: none;
     color: var(--nav-bar-font-color);
     font-family: var(--nav-bar-font);
@@ -186,40 +195,50 @@ html {
 
 .mobile-sidebar .mobile-items a:hover,
 .mobile-sidebar .mobile-items a:focus {
-    background-color: var(--hover-color);
-    outline: none;
+    color: var(--hover-color);
+    text-decoration: underline;
 }
 
 
+/* --- NEW: Adjustments for Main Content Padding --- */
 main {
+    /* Clears Scroll Container (~40px) + Nav Bar (~50px) + space */
+    padding-top: 100px; 
     padding-left: 3rem;
     color: var(--nav-bar-font-color); 
     font-family: var(--content-font); 
 }
 
-.title .mainTitle {
+.title h1.mainTitle {
     font-size: 5rem;
-    margin-bottom: 20px;
+    margin-bottom: 0;
     font-family: var(--nav-bar-font); 
+    padding: 0;
+}
+
+.title h2 {
+    padding: 0;
+    font-size: 3rem;
+    margin-bottom: 0;
+    color: var(--sub-heading-color);
+    font-family: var(--nav-bar-font);
 }
 
 .content .introduction {
     font-size: 1.5rem;
 }
 
-/* --- CODE SNIPPET STYLING START (With horizontal scrolling) --- */
-
 /* Style the wrapper for the code example */
 .code-example {
     margin-top: 30px;
     margin-bottom: 50px;
-}
 
-.code-example h2 {
-    font-family: var(--nav-bar-font);
-    font-size: 2rem;
-    color: var(--border-color); /* Use a bright teal for the sub-heading */
-    margin-bottom: 10px;
+    h2 {
+        font-family: var(--nav-bar-font);
+        font-size: 1rem;
+        color: var(--sub-heading-color); /* Use a bright teal for the sub-heading */
+        margin-bottom: 10px;
+    }
 }
 
 /* Prism.js uses 'pre' and 'code' elements for the block */
@@ -258,8 +277,15 @@ pre[class*="language-"] {
         margin: 5px; /* Less margin on mobile */
         border-radius: 10px;
         padding: 0 15px; /* Less padding on small screens */
+        /* Recalculate fixed width for mobile */
+        width: calc(100% - 10px); /* Full width minus the 2x 5px margin */
     }
     
+    /* NEW: Adjust the 'show-nav' position for mobile margin */
+    .nav.show-nav {
+        top: 45px; /* Scroll container is ~40px + 5px nav margin = 45px */
+    }
+
     .nav .logo h1 {
         font-size: 1.25rem; /* Smaller logo on mobile */
     }
@@ -269,13 +295,17 @@ pre[class*="language-"] {
     }
 
     .menu-toggle {
-        display: block; /* Show the hamburger icon */
+        /* This rule now only ensures the toggle area is a block element on mobile */
+        display: flex; 
     }
+    
+    /* Removed redundant/conflicting icon visibility rules */
+    /* JavaScript handles the swapping now */
 
     /* Main Content Adjustments */
     main {
-        /* Reduced horizontal padding */
-        padding: 1.5rem; 
+        /* Keep the same 100px padding, which is sufficient for mobile as well. */
+        padding: 100px 1.5rem 1.5rem; 
     }
     
     .title .mainTitle {
@@ -285,5 +315,5 @@ pre[class*="language-"] {
     .content .introduction {
         font-size: 1.1rem; /* Smaller intro text */
     }
-
+    
 }
