@@ -150,6 +150,7 @@ html {
     left: 50%;
     transform: translate(-50%, -50%);
     transition: opacity 0.3s ease;
+    display: none;
 }
 
 /* --- Mobile Sidebar --- */
@@ -316,4 +317,5 @@ pre[class*="language-"] {
         font-size: 1.1rem; /* Smaller intro text */
     }
     
+
 }
