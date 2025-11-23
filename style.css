@@ -1,0 +1,319 @@
+:root {
+    /* Updated to dark/teal colors from the palette */
+    --nav-bar-color: #0B525B; /* A dark teal for the navbar background */
+    --nav-bar-font-color: #D3DAD9; /* Light grey for font color for contrast */
+    --nav-bar-font: "Orbitron", sans-serif;
+    --top-info-font: "Silkscreen", sans-serif;
+    --content-font: "Google Sans Code", monospace;
+    --background-color: #212F45; /* Dark navy blue for the main background */
+    --border-color: #006466; /* A brighter teal for accents/borders and code text */
+    --hover-color: #4D194D; /* A deep purple for hover state */
+    --code-background-color: #065A60; /* Slightly different dark teal for code blocks */
+    --sub-heading-color: #006466; /* bright teal for the sub-heading */
+}
+
+/* --- NEW: Utility class for hiding elements --- */
+.hidden {
+    display: none !important;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+html {
+    background-color: var(--background-color);
+}
+
+.scroll-container {
+    background-color: var(--background-color);
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    box-sizing: border-box;
+    border-bottom: solid 2px var(--border-color);
+    padding: 10px;
+    
+    /* Make the scroll container fixed to keep it at the top */
+    position: fixed; 
+    top: 0; 
+    left: 0;
+    z-index: 1000; /* Ensure it is above the nav bar */
+    
+    .scrolling-text {
+        display: inline-block;
+        padding-left: 100%;
+        animation: scroll-left 30s linear infinite;
+        font-family: var(--top-info-font);
+        color: var(--nav-bar-font-color); 
+    }
+}
+
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* --- Nav Bar Styling (Scroll-up-to-Show) --- */
+.nav {
+    margin: 10px;
+    border-radius: 50px;
+    border-style: solid;
+    /* Updated border color */
+    border-color: var(--border-color);
+    background-color: var(--nav-bar-color);
+    display: flex;
+    flex-direction: row;
+    /* Pushes logo and items to opposite ends */
+    justify-content: space-between; 
+    /* Vertically centers the logo and links */
+    align-items: center; 
+    padding: 0 40px; 
+    
+    /* --- FIXED NAV PROPERTIES --- */
+    position: fixed; 
+    top: -100px; /* Initial HIDDEN position */
+    left: 50%; 
+    transform: translateX(-50%); 
+    width: calc(100% - 20px); 
+    max-width: 1400px; 
+    z-index: 999; /* Below the scroll-container */
+    
+    transition: top 0.3s ease-in-out; 
+}
+
+/* NEW: Class to make the navigation bar visible, appearing below the scroll-container */
+.nav.show-nav {
+    top: 50px; /* Scroll container is ~40px + 10px nav margin = 50px */
+}
+
+.nav .logo h1 {
+    align-self: center;
+    font-family: var(--nav-bar-font);
+    color: var(--nav-bar-font-color); 
+    font-size: 2rem; 
+}
+
+
+.nav .items {
+    /* Desktop menu is visible by default */
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    position: relative;
+}
+
+.nav .items a {
+    text-decoration: none;
+    color: var(--nav-bar-font-color);
+    font-family: var(--nav-bar-font);
+    font-size: 1.5rem;
+    transition: color 0.3s ease; 
+}
+
+.nav .items a:hover {
+    /* Updated hover color */
+    color: var(--hover-color);
+    text-decoration: underline;
+}
+
+/* --- Mobile Menu Toggle (Hamburger) --- */
+.menu-toggle {
+    cursor: pointer;
+    color: var(--nav-bar-font-color);
+    padding: 10px;
+    /* Z-index change: Bump it up to guarantee it's on top of sidebar (z-index: 1000) */
+    z-index: 1010; 
+    transition: color 0.3s ease;
+    position: relative; 
+    width: 44px; 
+    height: 44px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    display: none; /* Hidden by default on desktop, will be shown in media query */
+}
+
+.menu-toggle .menu-icon {
+    fill: var(--nav-bar-font-color);
+    width: 32px; 
+    height: 32px;
+    position: absolute; 
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s ease;
+}
+
+/* --- Mobile Sidebar --- */
+.mobile-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 250px; 
+    max-width: 80vw; 
+    height: 100%;
+    background-color: var(--nav-bar-color);
+    z-index: 1000;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.7);
+    transform: translateX(100%); 
+    transition: transform 0.3s cubic-bezier(0.785, 0.135, 0.15, 0.86); 
+    
+    /* Adjusted padding to clear the fixed scroll-container */
+    padding-top: 50px; 
+    
+    border-left: 2px solid var(--border-color);
+}
+
+.mobile-sidebar.open {
+    transform: translateX(0); 
+}
+
+.mobile-sidebar .mobile-items {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.mobile-sidebar .mobile-items a {
+    text-decoration: none;
+    color: var(--nav-bar-font-color);
+    font-family: var(--nav-bar-font);
+    font-size: 1.25rem;
+    padding: 15px 10px;
+    margin-bottom: 5px;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.mobile-sidebar .mobile-items a:hover,
+.mobile-sidebar .mobile-items a:focus {
+    color: var(--hover-color);
+    text-decoration: underline;
+}
+
+
+/* --- NEW: Adjustments for Main Content Padding --- */
+main {
+    /* Clears Scroll Container (~40px) + Nav Bar (~50px) + space */
+    padding-top: 100px; 
+    padding-left: 3rem;
+    color: var(--nav-bar-font-color); 
+    font-family: var(--content-font); 
+}
+
+.title h1.mainTitle {
+    font-size: 5rem;
+    margin-bottom: 0;
+    font-family: var(--nav-bar-font); 
+    padding: 0;
+}
+
+.title h2 {
+    padding: 0;
+    font-size: 3rem;
+    margin-bottom: 0;
+    color: var(--sub-heading-color);
+    font-family: var(--nav-bar-font);
+}
+
+.content .introduction {
+    font-size: 1.5rem;
+}
+
+/* Style the wrapper for the code example */
+.code-example {
+    margin-top: 30px;
+    margin-bottom: 50px;
+
+    h2 {
+        font-family: var(--nav-bar-font);
+        font-size: 1rem;
+        color: var(--sub-heading-color); /* Use a bright teal for the sub-heading */
+        margin-bottom: 10px;
+    }
+}
+
+/* Prism.js uses 'pre' and 'code' elements for the block */
+pre[class*="language-"] {
+    /* Set background to your variable, using !important to override the theme file */
+    background-color: var(--code-background-color) !important; 
+    
+    /* Add padding and rounded corners */
+    padding: 15px; 
+    border-radius: 10px;
+    
+    /* Add border for depth */
+    border: 1px solid var(--border-color);
+    
+    /* Enable horizontal scrolling when content is too wide (GitHub-like behavior) */
+    overflow-x: auto; 
+}
+
+/* Ensure the font matches your main content font */
+code[class*="language-"],
+pre[class*="language-"] {
+    font-family: var(--content-font) !important;
+    font-size: 1rem;
+}
+
+/* --- CODE SNIPPET STYLING END --- */
+
+
+/* =========================================================
+   MEDIA QUERIES FOR RESPONSIVENESS (Mobile/Tablet View)
+   ========================================================= */
+
+@media (max-width: 768px) {
+    /* Navigation Bar Adjustments */
+    .nav {
+        margin: 5px; /* Less margin on mobile */
+        border-radius: 10px;
+        padding: 0 15px; /* Less padding on small screens */
+        /* Recalculate fixed width for mobile */
+        width: calc(100% - 10px); /* Full width minus the 2x 5px margin */
+    }
+    
+    /* NEW: Adjust the 'show-nav' position for mobile margin */
+    .nav.show-nav {
+        top: 45px; /* Scroll container is ~40px + 5px nav margin = 45px */
+    }
+
+    .nav .logo h1 {
+        font-size: 1.25rem; /* Smaller logo on mobile */
+    }
+
+    .nav .items {
+        display: none; /* Hide the desktop menu links */
+    }
+
+    .menu-toggle {
+        /* This rule now only ensures the toggle area is a block element on mobile */
+        display: flex; 
+    }
+    
+    /* Removed redundant/conflicting icon visibility rules */
+    /* JavaScript handles the swapping now */
+
+    /* Main Content Adjustments */
+    main {
+        /* Keep the same 100px padding, which is sufficient for mobile as well. */
+        padding: 100px 1.5rem 1.5rem; 
+    }
+    
+    .title .mainTitle {
+        font-size: 3rem; /* Smaller title on mobile */
+    }
+
+    .content .introduction {
+        font-size: 1.1rem; /* Smaller intro text */
+    }
+    
+}
