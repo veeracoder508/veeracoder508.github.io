@@ -27,6 +27,7 @@ html {
 }
 
 .scroll-container {
+    z-index: 999;
     background-color: var(--background-color);
     width: 100%;
     overflow: hidden;
@@ -37,6 +38,7 @@ html {
     padding: 10px;
     position: relative;
     .scrolling-text {
+        z-index: 999;
         display: inline-block;
         padding-left: 100%;
         animation: scroll-left 30s linear infinite;
@@ -73,6 +75,7 @@ html {
 }
 
 .nav .logo h1 {
+    z-index: 999;
     align-self: center;
     font-family: var(--nav-bar-font);
     color: var(--nav-bar-font-color); 
@@ -89,6 +92,7 @@ html {
 }
 
 .nav .items a {
+    z-index: 999;
     text-decoration: none;
     color: var(--nav-bar-font-color);
     font-family: var(--nav-bar-font);
@@ -104,6 +108,7 @@ html {
 
 /* --- NEW: Mobile Menu Toggle (Hamburger) --- */
 .menu-toggle {
+    z-index: 999;
     display: none; /* Hidden by default on desktop */
     cursor: pointer;
     font-size: 2rem; /* Size of the icon is now controlled by the SVG width/height */
@@ -123,6 +128,7 @@ html {
 /* --- NEW: Styling for the SVG icons inside the toggle button --- */
 .menu-toggle .menu-icon {
     /* The SVG fill color is set to the nav font color */
+    z-index: 999;
     color: var(--nav-bar-font-color);
     /* Set the SVG size using variables */
     width: 32px; 
@@ -137,6 +143,7 @@ html {
 
 /* --- NEW: Mobile Sidebar Styling --- */
 .mobile-sidebar {
+    z-index: 999;
     position: fixed;
     top: 0;
     right: 0;
@@ -154,16 +161,19 @@ html {
 }
 
 .mobile-sidebar.open {
+    z-index: 999;
     transform: translateX(0); /* Slide into view */
 }
 
 .mobile-sidebar .mobile-items {
+    z-index: 999;
     display: flex;
     flex-direction: column;
     padding: 20px;
 }
 
 .mobile-sidebar .mobile-items a {
+    z-index: 999;
     text-decoration: none;
     color: var(--nav-bar-font-color);
     font-family: var(--nav-bar-font);
@@ -275,4 +285,5 @@ pre[class*="language-"] {
     .content .introduction {
         font-size: 1.1rem; /* Smaller intro text */
     }
+
 }
