@@ -1,0 +1,30 @@
+menu:
+    home
+    about
+    docs
+    company
+
+content:
+    home page:
+        introduction for Termi
+        "Termi, a new era of terminal for beginners."
+
+        <quick guid>
+
+    about:
+        brief introduction to the software.
+        "<--not yet-->"
+
+    docs:
+        dcumentation for the shell.
+        how to start the shell:
+            > python -m termi # for python
+            <or>
+            > ./termi # for linux/CMD
+            <or>
+            > termi.ps1 # for power shell
+
+        <--rest not set now-->
+
+    company:
+        about all my services
