@@ -150,7 +150,6 @@ html {
     left: 50%;
     transform: translate(-50%, -50%);
     transition: opacity 0.3s ease;
-    display: none;
 }
 
 /* --- Mobile Sidebar --- */
@@ -217,7 +216,7 @@ main {
     padding: 0;
 }
 
-.title h2 {
+.title h2.subTitle {
     padding: 0;
     font-size: 3rem;
     margin-bottom: 0;
@@ -225,30 +224,38 @@ main {
     font-family: var(--nav-bar-font);
 }
 
+.content {
+    padding-bottom: 3rem;
+}
+
 .content .introduction {
     font-size: 1.5rem;
 }
 
 /* Style the wrapper for the code example */
-.code-example {
+.code {
     margin-top: 30px;
     margin-bottom: 50px;
 
     h2 {
         font-family: var(--nav-bar-font);
         font-size: 1rem;
-        color: var(--sub-heading-color); /* Use a bright teal for the sub-heading */
+        color: var(--heading-color); /* Use a bright teal for the sub-heading */
         margin-bottom: 10px;
+        
+        span {
+            background-color: var(--code-background-color);
+            border-radius: 10px;
+            padding: 0.5rem;
+        }
     }
 }
 
-/* Prism.js uses 'pre' and 'code' elements for the block */
 pre[class*="language-"] {
     /* Set background to your variable, using !important to override the theme file */
-    background-color: var(--code-background-color) !important; 
+    background-color: var(--code-background-color) !important;
     
     /* Add padding and rounded corners */
-    padding: 15px; 
     border-radius: 10px;
     
     /* Add border for depth */
@@ -258,24 +265,16 @@ pre[class*="language-"] {
     overflow-x: auto; 
 }
 
-/* Ensure the font matches your main content font */
 code[class*="language-"],
 pre[class*="language-"] {
     font-family: var(--content-font) !important;
     font-size: 1rem;
 }
 
-/* --- CODE SNIPPET STYLING END --- */
-
-
-/* =========================================================
-   MEDIA QUERIES FOR RESPONSIVENESS (Mobile/Tablet View)
-   ========================================================= */
-
 @media (max-width: 768px) {
     /* Navigation Bar Adjustments */
     .nav {
-        margin: 5px; /* Less margin on mobile */
+        margin: 0px; /* Less margin on mobile */
         border-radius: 10px;
         padding: 0 15px; /* Less padding on small screens */
         /* Recalculate fixed width for mobile */
@@ -317,5 +316,4 @@ pre[class*="language-"] {
         font-size: 1.1rem; /* Smaller intro text */
     }
     
-
 }
