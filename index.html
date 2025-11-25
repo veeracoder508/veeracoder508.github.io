@@ -26,7 +26,6 @@
         <div class="items">
             <a href="#">about</a>
             <a href="#">docs</a>
-            <a href="#">products</a>
             <a href="#">company</a>
             <a href="https://veera-flutecode-profio.42web.io" target="_blank">contact</a>
         </div>
@@ -43,9 +42,9 @@
     
     <div class="mobile-sidebar" id="mobile-sidebar">
         <div class="mobile-items">
+            <a href="#">home</a>
             <a href="#">about</a>
             <a href="#">docs</a>
-            <a href="#">products</a>
             <a href="#">company</a>
             <a href="https://veera-flutecode-profio.42web.io" target="_blank">contact</a>
         </div>
@@ -54,18 +53,32 @@
     <main>
         <div class="title">
             <h1 class="mainTitle">Termi</h1>
-            <h2>dsf</h2>
         </div>
         <div class="content">
             <p class="introduction">
                 Termi, a new era of terminal for beginners.
             </p>
         </div>
-        <div class="code-example">
-            <h2>how to open the shell</h2>
-            <pre><code class="language-powershell">
-python -m termi
-            </code></pre>
+
+        <div class="content">
+            <div class="title">
+                <h2 class="subTitle">span a quick starting guide:</h2>
+            </div>
+            <div class="code">
+                <h2><span>how to open the shell</span></h2>
+                <pre>
+                    <code class="language-powershell">
+> python -m termi # for python
+                    </code>
+                    <code class="language-powershell">
+> termi.ps1 # for powershell
+                    </code>
+                    <code class="language-powershell">
+> ./termi # for Linux/CMD
+                    </code>
+                </pre>
+            </div>
+
         </div>
 
     </main>
@@ -75,7 +88,7 @@ python -m termi
     
     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
     <script>
-    AOS.init();
+        AOS.init();
     </script>
 
     <script src="script.js"></script>
